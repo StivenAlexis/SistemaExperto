@@ -1,0 +1,265 @@
+{
+  "modulo": "cadena_frio",
+  "descripcion": "Reglas del módulo de cadena de frío y temperaturas (R01-R06). Evalúan temperatura de almacenamiento, estado de equipos de refrigeración, cocción y recepción de mercadería.",
+  "reglas": [
+    {
+      "id": "R01",
+      "nombre": "Rotura de cadena de frío en alimento perecedero",
+      "modulo": "cadena_frio",
+      "condiciones": [
+        {
+          "objeto": "temperatura",
+          "atributo": "valor_celsius",
+          "operador": ">",
+          "valor": 5,
+          "descripcion": "Temperatura medida supera los 5°C (límite para refrigeración)"
+        },
+        {
+          "objeto": "alimento",
+          "atributo": "es_perecedero",
+          "operador": "=",
+          "valor": true,
+          "descripcion": "El alimento requiere refrigeración para su conservación segura"
+        },
+        {
+          "objeto": "exposicion",
+          "atributo": "riesgo_prolongado",
+          "operador": "=",
+          "valor": true,
+          "descripcion": "La exposición fue prolongada (>2h) o el tiempo es desconocido (activado por RI-01)"
+        }
+      ],
+      "conclusion": {
+        "diagnostico": {
+          "rotura_cadena_frio": true
+        }
+      },
+      "nivel_riesgo": "CRÍTICO",
+      "prioridad": 10,
+      "acciones": [
+        "Descartar inmediatamente todo el lote expuesto",
+        "Registrar el incidente en el libro de control de temperatura",
+        "Reparar o reemplazar el equipo de refrigeración antes de reiniciar operaciones",
+        "Implementar registro de temperatura con frecuencia horaria hasta normalizar",
+        "Notificar al responsable del establecimiento"
+      ],
+      "normativa": ["CAA Artículo de Refrigeración", "BPM"],
+      "origen": "EXTRAIDA",
+      "explicacion": "La temperatura del alimento supera los 5°C y la exposición fue prolongada o de tiempo desconocido. En la zona de peligro (5°C-60°C) las bacterias patógenas se multiplican rápidamente. Con 2 horas o más de exposición, la carga bacteriana puede superar límites seguros.",
+      "comentario": "La zona de peligro térmico (5°C a 60°C) es el rango donde los patógenos alimentarios como Salmonella, E. coli y Listeria crecen más rápido. Dos horas de exposición es el límite máximo admisible por el CAA para alimentos perecederos."
+    },
+    {
+      "id": "R02",
+      "nombre": "Temperatura insuficiente en exhibidora caliente de alimentos cocidos",
+      "modulo": "cadena_frio",
+      "condiciones": [
+        {
+          "objeto": "equipo",
+          "atributo": "tipo",
+          "operador": "=",
+          "valor": "exhibidora_caliente",
+          "descripcion": "El equipo es una exhibidora de alimentos calientes (rotisserie)"
+        },
+        {
+          "objeto": "temperatura",
+          "atributo": "valor_celsius",
+          "operador": "<",
+          "valor": 60,
+          "descripcion": "La temperatura del equipo está por debajo de los 60°C requeridos"
+        },
+        {
+          "objeto": "alimento",
+          "atributo": "tipo",
+          "operador": "=",
+          "valor": "cocido_listo",
+          "descripcion": "El alimento es cocido listo para consumo (pollo, milanesas, etc.)"
+        }
+      ],
+      "conclusion": {
+        "diagnostico": {
+          "exhibidora_fria": true
+        }
+      },
+      "nivel_riesgo": "ALTO",
+      "prioridad": 8,
+      "acciones": [
+        "Retirar inmediatamente todos los alimentos de la exhibidora",
+        "Verificar y reparar el equipo de calentamiento antes de reiniciar",
+        "No vender ningún alimento hasta que la exhibidora alcance y mantenga 60°C o más",
+        "Evaluar con criterio organoléptico si los alimentos pueden ser recalentados o deben descartarse"
+      ],
+      "normativa": ["CAA", "BPM"],
+      "origen": "EXTRAIDA",
+      "explicacion": "Los alimentos cocidos listos para consumo deben mantenerse a 60°C o más para inhibir la proliferación bacteriana. Temperaturas por debajo de 60°C en la exhibidora crean zona de peligro activa mientras el alimento está expuesto al consumidor.",
+      "comentario": "La exhibidora caliente de rotissería opera en el límite superior de la zona de peligro. Si la temperatura cae por debajo de 60°C, los alimentos cocidos (ricos en nutrientes para bacterias) ingresan a la zona de peligro con alta carga inicial de consumidores esperando."
+    },
+    {
+      "id": "R03",
+      "nombre": "Heladera sin funcionar por tiempo desconocido",
+      "modulo": "cadena_frio",
+      "condiciones": [
+        {
+          "objeto": "equipo",
+          "atributo": "tipo",
+          "operador": "=",
+          "valor": "heladera",
+          "descripcion": "El equipo es una heladera o refrigerador"
+        },
+        {
+          "objeto": "equipo",
+          "atributo": "funcionando",
+          "operador": "=",
+          "valor": false,
+          "descripcion": "La heladera NO está funcionando (falla eléctrica, mecánica, etc.)"
+        },
+        {
+          "objeto": "exposicion",
+          "atributo": "tiempo_conocido",
+          "operador": "=",
+          "valor": false,
+          "descripcion": "No se sabe cuánto tiempo lleva sin funcionar la heladera"
+        }
+      ],
+      "conclusion": {
+        "diagnostico": {
+          "heladera_sin_funcionar": true
+        }
+      },
+      "nivel_riesgo": "CRÍTICO",
+      "prioridad": 10,
+      "acciones": [
+        "Detener el equipo defectuoso de forma segura",
+        "Descartar TODOS los alimentos perecederos almacenados en la heladera",
+        "Reparar o reemplazar el equipo antes de reiniciar su uso",
+        "Registrar el incidente detallando fecha, hora aproximada y productos afectados",
+        "Contactar al servicio técnico de mantenimiento de equipos"
+      ],
+      "normativa": ["CAA", "BPM"],
+      "origen": "EXTRAIDA",
+      "explicacion": "Una heladera no funcionando por tiempo desconocido es el peor escenario de cadena de frío: los alimentos estuvieron expuestos a temperatura ambiente por un período indeterminado. Sin saber el tiempo transcurrido, no se puede garantizar la inocuidad de ningún alimento almacenado.",
+      "comentario": "Este es uno de los casos más frecuentes en supermercados: se descubre la heladera sin funcionar al inicio del turno sin saber desde cuándo. El principio de precaución dicta descartar todo ante la imposibilidad de garantizar la inocuidad."
+    },
+    {
+      "id": "R04",
+      "nombre": "Temperatura de cocción insuficiente en alimento de origen animal",
+      "modulo": "cadena_frio",
+      "condiciones": [
+        {
+          "objeto": "coccion",
+          "atributo": "temperatura",
+          "operador": "<",
+          "valor": 60,
+          "descripcion": "La temperatura de cocción no alcanzó los 60°C mínimos"
+        },
+        {
+          "objeto": "alimento",
+          "atributo": "origen",
+          "operador": "=",
+          "valor": "animal",
+          "descripcion": "El alimento es de origen animal (carnes, aves, pescados, huevos)"
+        }
+      ],
+      "conclusion": {
+        "diagnostico": {
+          "coccion_insuficiente": true
+        }
+      },
+      "nivel_riesgo": "ALTO",
+      "prioridad": 8,
+      "acciones": [
+        "No habilitar el alimento para consumo ni venta",
+        "Continuar la cocción hasta superar los 60°C en el punto más frío del alimento",
+        "Verificar la temperatura en el punto más frío con termómetro calibrado",
+        "Para aves y cerdo, la temperatura mínima recomendada es 74°C"
+      ],
+      "normativa": ["CAA"],
+      "origen": "EXTRAIDA",
+      "explicacion": "La cocción a temperatura suficiente es el paso crítico de control (PCC) más importante para destruir patógenos en alimentos de origen animal. Temperaturas inferiores a 60°C no garantizan la eliminación de Salmonella, E. coli O157:H7 y otros patógenos.",
+      "comentario": "Los alimentos de origen animal son el vehículo más frecuente de ETA. La cocción adecuada (≥60°C para carnes en general, ≥74°C para aves) es la barrera de control más efectiva antes de que el producto llegue al consumidor."
+    },
+    {
+      "id": "R05",
+      "nombre": "Reutilización segura de alimento cocido no vendido",
+      "modulo": "cadena_frio",
+      "condiciones": [
+        {
+          "objeto": "alimento",
+          "atributo": "tipo",
+          "operador": "=",
+          "valor": "cocido_no_vendido",
+          "descripcion": "El alimento es cocido que no se vendió en el turno anterior"
+        },
+        {
+          "objeto": "conservacion",
+          "atributo": "correcta",
+          "operador": "=",
+          "valor": true,
+          "descripcion": "La conservación posterior a la cocción fue correcta (temperatura adecuada)"
+        },
+        {
+          "objeto": "consumo",
+          "atributo": "mismo_dia",
+          "operador": "=",
+          "valor": true,
+          "descripcion": "El alimento se va a consumir o vender el mismo día"
+        }
+      ],
+      "conclusion": {
+        "diagnostico": {
+          "reutilizacion_permitida": true
+        }
+      },
+      "nivel_riesgo": "BAJO",
+      "prioridad": 2,
+      "acciones": [
+        "El alimento puede reutilizarse bajo supervisión del responsable",
+        "Registrar el uso del alimento reutilizado con fecha y hora",
+        "Recalentar a temperatura de servicio (≥60°C) antes de volver a exhibir",
+        "No reutilizar más de una vez el mismo alimento"
+      ],
+      "normativa": ["BPM"],
+      "origen": "EXTRAIDA",
+      "explicacion": "Un alimento cocido que se conservó correctamente (refrigerado o en caliente según corresponda) y se va a consumir el mismo día puede reutilizarse con supervisión. Las condiciones de conservación correcta mitigan el riesgo residual.",
+      "comentario": "La reutilización controlada es una práctica habitual en rotisería. El riesgo es BAJO cuando se cumplen las tres condiciones: cocción previa, conservación correcta y consumo el mismo día. Sin alguna de ellas, el riesgo escala."
+    },
+    {
+      "id": "R06",
+      "nombre": "Rechazo de lote por cadena de frío comprometida en recepción",
+      "modulo": "cadena_frio",
+      "condiciones": [
+        {
+          "objeto": "recepcion",
+          "atributo": "temperatura_fuera_rango",
+          "operador": "=",
+          "valor": true,
+          "descripcion": "La temperatura del producto en recepción estaba fuera del rango admisible"
+        },
+        {
+          "objeto": "proveedor",
+          "atributo": "justifica_cadena",
+          "operador": "=",
+          "valor": false,
+          "descripcion": "El proveedor no puede justificar el mantenimiento de la cadena de frío durante el transporte"
+        }
+      ],
+      "conclusion": {
+        "diagnostico": {
+          "lote_rechazado": true
+        }
+      },
+      "nivel_riesgo": "CRÍTICO",
+      "prioridad": 9,
+      "acciones": [
+        "Rechazar el lote completo sin recibir los productos",
+        "Documentar la no conformidad en el formulario de recepción",
+        "Notificar al proveedor por escrito con los datos de la no conformidad",
+        "Registrar el incidente en el sistema de trazabilidad del establecimiento",
+        "Comunicar la situación al área de compras para evaluación del proveedor"
+      ],
+      "normativa": ["CAA", "BPM", "SENASA"],
+      "origen": "EXTRAIDA",
+      "explicacion": "La recepción de mercadería con cadena de frío comprometida (temperatura fuera de rango sin justificación del proveedor) representa un punto de entrada de alimentos potencialmente inseguros al establecimiento. El rechazo protege al consumidor final.",
+      "comentario": "El control de recepción es uno de los puntos más críticos del sistema de inocuidad. Aceptar mercadería con cadena de frío comprometida invalida todos los controles posteriores del establecimiento."
+    }
+  ]
+}

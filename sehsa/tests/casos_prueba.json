@@ -1,0 +1,134 @@
+[
+  {
+    "id": 1,
+    "nombre": "Fallo de cadena de frío — heladera sin funcionar con carne cruda",
+    "descripcion": "Valida que el motor detecte rotura de cadena de frío cuando la heladera está sin funcionar por tiempo desconocido con alimentos perecederos. Prueba que RI-01 habilita R01 y que R03 se activa de forma independiente.",
+    "hechos": {
+      "alimento": {
+        "tipo": "carne_cruda",
+        "es_perecedero": true,
+        "vencimiento_vigente": true
+      },
+      "temperatura": {
+        "valor_celsius": 14,
+        "medida": true
+      },
+      "equipo": {
+        "tipo": "heladera",
+        "funcionando": false
+      },
+      "exposicion": {
+        "tiempo_conocido": false
+      }
+    },
+    "nivel_riesgo_esperado": "CRÍTICO",
+    "reglas_esperadas": ["RI-01", "R03", "R01"],
+    "aspecto_validado": "Encadenamiento hacia adelante: RI-01 deriva 'riesgo_prolongado=True' que habilita R01. R03 actúa sobre equipo sin funcionar. Nivel máximo CRÍTICO."
+  },
+  {
+    "id": 2,
+    "nombre": "Operario con hipoclorito sin EPP",
+    "descripcion": "Valida que R12 se active cuando un operario trabaja con hipoclorito en el área de limpieza sin usar EPP. Prueba el módulo de seguridad laboral.",
+    "hechos": {
+      "personal": {
+        "usa_epp": false
+      },
+      "establecimiento": {
+        "area": "limpieza"
+      },
+      "quimico": {
+        "tipo": "hipoclorito",
+        "concentracion": 500
+      },
+      "incidente": {
+        "accidente_laboral": false
+      }
+    },
+    "nivel_riesgo_esperado": "ALTO",
+    "reglas_esperadas": ["R12"],
+    "aspecto_validado": "Módulo EPP: todas las condiciones de R12 (sin EPP + área limpieza + químico hipoclorito) están presentes. Ninguna regla de mayor nivel debe activarse."
+  },
+  {
+    "id": 3,
+    "nombre": "Plaga en depósito con envases herméticos",
+    "descripcion": "Valida R16 (plagas con envases íntegros) y R18 (control de plagas vencido). El test usa 35 días para superar el umbral de 30 días de R18. Prueba el módulo de plagas.",
+    "hechos": {
+      "plaga": {
+        "indicios": true,
+        "excrementos_sobre_productos": false,
+        "dias_ultimo_control": 35
+      },
+      "alimento": {
+        "envase_hermetico": true,
+        "envase_dañado": false
+      }
+    },
+    "nivel_riesgo_esperado": "ALTO",
+    "reglas_esperadas": ["R16", "R18"],
+    "aspecto_validado": "Módulo plagas: R16 actúa sobre indicios + envase íntegro; R18 actúa sobre control vencido (>30 días) + indicios. Nota: se usa 35 días (no 21) para superar el umbral de R18."
+  },
+  {
+    "id": 4,
+    "nombre": "Contaminación cruzada por utensilios y sin lavado de manos",
+    "descripcion": "Valida R07 (contaminación cruzada crítica), R09 (manipulación sin lavado de manos) y R10 (utensilios compartidos sin lavar). Prueba el módulo de contaminación con múltiples reglas activadas.",
+    "hechos": {
+      "personal": {
+        "contacto_crudo_cocido": true,
+        "lavo_manos": false,
+        "va_a_manipular_listo": true
+      },
+      "utensilio": {
+        "compartido_sin_lavar": true
+      },
+      "alimento": {
+        "tipo": "cocido_listo",
+        "estado_organo": "normal"
+      }
+    },
+    "nivel_riesgo_esperado": "CRÍTICO",
+    "reglas_esperadas": ["R09", "R10", "R07"],
+    "aspecto_validado": "Módulo contaminación: R09 (sin lavado + va a manipular listo), R10 (utensilios compartidos), R07 (contacto crudo-cocido + sin lavado + tipo cocido_listo). R07 eleva a CRÍTICO."
+  },
+  {
+    "id": 5,
+    "nombre": "Exhibidora caliente por debajo de temperatura",
+    "descripcion": "Valida R02 cuando la exhibidora caliente tiene una temperatura inferior a 60°C con alimentos cocidos listos. Prueba la regla de zona de peligro en caliente.",
+    "hechos": {
+      "equipo": {
+        "tipo": "exhibidora_caliente",
+        "funcionando": true
+      },
+      "temperatura": {
+        "valor_celsius": 52,
+        "medida": true
+      },
+      "alimento": {
+        "tipo": "cocido_listo",
+        "estado_organo": "normal"
+      }
+    },
+    "nivel_riesgo_esperado": "ALTO",
+    "reglas_esperadas": ["R02"],
+    "aspecto_validado": "Módulo cadena de frío: R02 actúa sobre exhibidora caliente + temp < 60°C + alimento cocido. Solo esta regla debe activarse — el equipo FUNCIONA, no se activa R03."
+  },
+  {
+    "id": 6,
+    "nombre": "CASO LÍMITE — Olor anormal con temperatura y fecha correctas",
+    "descripcion": "Valida que R08 se active por señal organoléptica negativa (olor anormal) aunque la temperatura sea correcta (4°C) y el vencimiento esté vigente. El motor no debe 'dejarse engañar' por los datos numéricos correctos.",
+    "hechos": {
+      "alimento": {
+        "tipo": "cocido_listo",
+        "vencimiento_vigente": true,
+        "estado_organo": "olor_anormal",
+        "es_perecedero": true
+      },
+      "temperatura": {
+        "valor_celsius": 4,
+        "medida": true
+      }
+    },
+    "nivel_riesgo_esperado": "CRÍTICO",
+    "reglas_esperadas": ["R08"],
+    "aspecto_validado": "CASO LÍMITE CRÍTICO: aunque temperatura=4°C (correcto) y vencimiento vigente, el olor anormal activa R08 con nivel CRÍTICO. Los datos numéricos correctos no compensan una señal organoléptica negativa."
+  }
+]

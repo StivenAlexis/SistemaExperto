@@ -1,0 +1,131 @@
+{
+  "modulo": "plagas",
+  "descripcion": "Reglas del módulo de control de plagas (R16-R18). Evalúan indicios de presencia de vectores (insectos, roedores), estado del envase y vigencia del programa de control.",
+  "reglas": [
+    {
+      "id": "R16",
+      "nombre": "Indicios de plagas con envases herméticos intactos sin contacto directo",
+      "modulo": "plagas",
+      "condiciones": [
+        {
+          "objeto": "plaga",
+          "atributo": "indicios",
+          "operador": "=",
+          "valor": true,
+          "descripcion": "Hay indicios de presencia de plaga (rastros, excrementos en área, avistamiento)"
+        },
+        {
+          "objeto": "alimento",
+          "atributo": "envase_hermetico",
+          "operador": "=",
+          "valor": true,
+          "descripcion": "Los productos potencialmente afectados están en envases herméticos"
+        },
+        {
+          "objeto": "plaga",
+          "atributo": "excrementos_sobre_productos",
+          "operador": "=",
+          "valor": false,
+          "descripcion": "No se detectaron excrementos directamente sobre los productos o envases"
+        }
+      ],
+      "conclusion": {
+        "diagnostico": {
+          "plaga_con_envase_integro": true
+        }
+      },
+      "nivel_riesgo": "ALTO",
+      "prioridad": 7,
+      "acciones": [
+        "Segregar los lotes del área afectada para inspección individual",
+        "Inspeccionar cada envase manualmente buscando daños, perforaciones o contaminación visible",
+        "Liberar los lotes que no presenten contacto confirmado con la plaga",
+        "Notificar al servicio de control de plagas para visita urgente",
+        "Limpiar y desinfectar el área afectada",
+        "Registrar el incidente con descripción de la plaga observada y el área"
+      ],
+      "normativa": ["BPM", "POES"],
+      "origen": "EXTRAIDA",
+      "explicacion": "La presencia de indicios de plaga en un área con productos envasados herméticamente representa un riesgo ALTO pero manejable mediante inspección y segregación. El envase hermético intacto actúa como barrera de protección. La inspección individual determina si los productos pueden liberarse.",
+      "comentario": "Escenario típico: se encuentran rastros de roedor en el depósito pero los productos están en cajas de cartón o bolsas plásticas cerradas sin daños visibles. La inspección meticulosa es la clave — no se puede liberar automáticamente sin verificar cada unidad."
+    },
+    {
+      "id": "R17",
+      "nombre": "Indicios de plagas con envases comprometidos (dañados o no herméticos)",
+      "modulo": "plagas",
+      "condiciones": [
+        {
+          "objeto": "plaga",
+          "atributo": "indicios",
+          "operador": "=",
+          "valor": true,
+          "descripcion": "Hay indicios de presencia de plaga en el área"
+        },
+        {
+          "objeto": "alimento",
+          "atributo": "envase_comprometido",
+          "operador": "=",
+          "valor": true,
+          "descripcion": "Los envases NO son herméticos o están dañados (roído, perforado, roto)"
+        }
+      ],
+      "conclusion": {
+        "diagnostico": {
+          "plaga_con_envase_comprometido": true
+        }
+      },
+      "nivel_riesgo": "CRÍTICO",
+      "prioridad": 10,
+      "acciones": [
+        "Decomisar INMEDIATAMENTE todos los lotes del área afectada con envases comprometidos",
+        "No intentar recuperar ningún producto con daño de envase en presencia de plaga",
+        "Limpiar y desinfectar el área completa antes de reingresar productos",
+        "Solicitar visita de control de plagas con carácter urgente",
+        "Registrar y documentar el incidente con fotografías si es posible",
+        "Revisar el resto del depósito en búsqueda de áreas adicionales afectadas"
+      ],
+      "normativa": ["CAA", "BPM"],
+      "origen": "EXTRAIDA",
+      "explicacion": "Cuando los envases están dañados o no son herméticos, la plaga tuvo acceso directo al alimento. El riesgo de contaminación biológica (patógenos de heces/orina de roedores, exoesqueleto de insectos) es CRÍTICO. No existe inspección que pueda garantizar la inocuidad — el decomiso es obligatorio.",
+      "comentario": "Nota de implementación: 'envase_comprometido' es un hecho derivado que el motor calcula automáticamente cuando envase_hermetico=False O envase_dañado=True. Este OR se resuelve en el pre-procesamiento del motor (engine.py, método _preprocesar_hechos)."
+    },
+    {
+      "id": "R18",
+      "nombre": "Control de plagas vencido con indicios activos",
+      "modulo": "plagas",
+      "condiciones": [
+        {
+          "objeto": "plaga",
+          "atributo": "dias_ultimo_control",
+          "operador": ">",
+          "valor": 30,
+          "descripcion": "Han pasado más de 30 días desde el último control de plagas"
+        },
+        {
+          "objeto": "plaga",
+          "atributo": "indicios",
+          "operador": "=",
+          "valor": true,
+          "descripcion": "Hay indicios activos de presencia de plaga en el establecimiento"
+        }
+      ],
+      "conclusion": {
+        "diagnostico": {
+          "control_plagas_vencido": true
+        }
+      },
+      "nivel_riesgo": "ALTO",
+      "prioridad": 7,
+      "acciones": [
+        "Adelantar la próxima visita del servicio de control de plagas — no esperar al próximo control programado",
+        "Revisar y actualizar el programa de control de plagas si el intervalo entre visitas supera los 30 días",
+        "Intensificar el monitoreo manual (trampas, registros de avistamiento) hasta la próxima visita",
+        "Registrar la situación y la acción tomada en el libro de control de plagas"
+      ],
+      "normativa": ["BPM", "POES"],
+      "origen": "EXTRAIDA",
+      "explicacion": "Un programa de control de plagas con intervalos superiores a 30 días en presencia de indicios activos es insuficiente para contener la infestación. Los indicios activos con control vencido sugieren que la plaga no está siendo controlada eficazmente por el programa actual.",
+      "comentario": "La frecuencia del control de plagas debe estar definida en el POES (Procedimiento Operativo Estandarizado de Saneamiento). 30 días es el intervalo máximo habitual para establecimientos alimentarios. Indicios con control vencido = el programa está fallando."
+    }
+  ]
+}

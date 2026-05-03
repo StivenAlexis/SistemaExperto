@@ -1,0 +1,116 @@
+{
+  "modulo": "documentacion",
+  "descripcion": "Reglas del módulo de documentación y normativa (R19-R21). Evalúan registros de temperatura, rotulación de productos y casos fuera del alcance del sistema (ETA).",
+  "reglas": [
+    {
+      "id": "R19",
+      "nombre": "Ausencia de registros de temperatura con perecederos almacenados",
+      "modulo": "documentacion",
+      "condiciones": [
+        {
+          "objeto": "documentacion",
+          "atributo": "registros_temperatura",
+          "operador": "=",
+          "valor": false,
+          "descripcion": "No se registra la temperatura de los equipos de frío de forma periódica"
+        },
+        {
+          "objeto": "alimento",
+          "atributo": "perecedero_almacenado",
+          "operador": "=",
+          "valor": true,
+          "descripcion": "Hay alimentos perecederos almacenados en equipos de refrigeración sin registro"
+        }
+      ],
+      "conclusion": {
+        "diagnostico": {
+          "sin_registros_temperatura": true
+        }
+      },
+      "nivel_riesgo": "ALTO",
+      "prioridad": 7,
+      "acciones": [
+        "Aplicar principio de precaución: evaluar el estado organoléptico de todos los perecederos",
+        "Implementar de inmediato una planilla de registro de temperatura (mínimo 2 veces por día)",
+        "Capacitar al personal responsable en el registro correcto de temperaturas",
+        "Establecer procedimiento de acción ante desvíos de temperatura detectados en el registro"
+      ],
+      "normativa": ["BPM", "POES"],
+      "origen": "EXTRAIDA",
+      "explicacion": "Los registros de temperatura son la evidencia documental que permite demostrar el mantenimiento de la cadena de frío. Sin registros, no hay forma de verificar que los alimentos estuvieron a temperatura segura. La ausencia de registros es en sí misma una no conformidad grave en BPM.",
+      "comentario": "Sin registros de temperatura no hay trazabilidad de la cadena de frío. Si ocurre un brote de ETA, la ausencia de registros implica responsabilidad del establecimiento. El registro es además una herramienta preventiva: detecta desvíos antes de que sean críticos."
+    },
+    {
+      "id": "R20",
+      "nombre": "Rotulación incorrecta o ausente en producto en exhibición",
+      "modulo": "documentacion",
+      "condiciones": [
+        {
+          "objeto": "documentacion",
+          "atributo": "rotulacion_correcta",
+          "operador": "=",
+          "valor": false,
+          "descripcion": "El producto no tiene rotulación correcta (falta información obligatoria, está ilegible o es incorrecta)"
+        },
+        {
+          "objeto": "alimento",
+          "atributo": "en_exhibicion",
+          "operador": "=",
+          "valor": true,
+          "descripcion": "El producto con rotulación incorrecta está en exhibición para la venta al público"
+        }
+      ],
+      "conclusion": {
+        "diagnostico": {
+          "rotulacion_no_conforme": true
+        }
+      },
+      "nivel_riesgo": "MEDIO",
+      "prioridad": 4,
+      "acciones": [
+        "Retirar temporalmente el producto de la exhibición",
+        "Corregir la rotulación con toda la información obligatoria según el CAA",
+        "Volver a exhibir el producto solo después de verificar que la rotulación es correcta y completa",
+        "Verificar si el error de rotulación es sistémico (afecta a todo el lote o proveedor)"
+      ],
+      "normativa": ["CAA Artículo 235 bis", "Ley 18284"],
+      "origen": "EXTRAIDA",
+      "explicacion": "La rotulación incorrecta puede inducir al consumidor a error sobre ingredientes, alérgenos, vencimiento o condiciones de conservación. Es una no conformidad legal que puede derivar en sanciones. La información de alérgenos en particular puede ser crítica para consumidores con alergias.",
+      "comentario": "Riesgo MEDIO porque el daño no es inmediato como en los casos de temperatura, pero el impacto legal y sobre el consumidor es significativo. La ausencia de información de alérgenos puede ser especialmente grave para personas con alergias graves (anafilaxia)."
+    },
+    {
+      "id": "R21",
+      "nombre": "Sospecha de Enfermedad Transmitida por Alimentos — FUERA DE ALCANCE",
+      "modulo": "documentacion",
+      "condiciones": [
+        {
+          "objeto": "incidente",
+          "atributo": "sospecha_ETA",
+          "operador": "=",
+          "valor": true,
+          "descripcion": "Hay sospecha confirmada de ETA: personas con síntomas atribuibles al consumo de alimentos"
+        }
+      ],
+      "conclusion": {
+        "diagnostico": {
+          "fuera_de_alcance": true,
+          "derivacion_medica_urgente": true
+        }
+      },
+      "nivel_riesgo": "CRÍTICO",
+      "prioridad": 10,
+      "acciones": [
+        "STOP TOTAL — el sistema experto NO emitirá diagnóstico para este caso",
+        "Derivar INMEDIATAMENTE a médico y autoridad sanitaria competente",
+        "No emitir diagnóstico alimentario — este caso está fuera del alcance del sistema",
+        "Conservar muestras de todos los alimentos involucrados para análisis oficial",
+        "No manipular ni desechar ningún alimento hasta que las autoridades lo indiquen",
+        "Registrar los datos de las personas afectadas para la investigación epidemiológica"
+      ],
+      "normativa": ["CAA", "Ley 18284", "SENASA", "Autoridad sanitaria jurisdiccional"],
+      "origen": "INFERIDA",
+      "explicacion": "Este caso trasciende el alcance del sistema experto SEHSA. La sospecha de ETA (personas enfermas por consumo de alimentos) es una emergencia sanitaria que requiere médicos y autoridades, no un sistema de recomendaciones operativas. El motor se detiene completamente ante esta situación.",
+      "comentario": "R21 es la regla de derivación urgente del módulo de documentación. Su activación efectiva ocurre a través de RI-04 (incertidumbre) que tiene evaluación prioritaria. Esta copia en el módulo de documentación es parte de la base de conocimiento documentada pero el motor la maneja vía RI-04."
+    }
+  ]
+}

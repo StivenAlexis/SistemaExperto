@@ -1,0 +1,194 @@
+{
+  "modulo": "contaminacion",
+  "descripcion": "Reglas del módulo de contaminación cruzada e higiene (R07-R11). Evalúan higiene del personal, manejo de utensilios, estado organoléptico y presencia de cuerpos extraños.",
+  "reglas": [
+    {
+      "id": "R07",
+      "nombre": "Contaminación cruzada de alimento cocido listo para consumo",
+      "modulo": "contaminacion",
+      "condiciones": [
+        {
+          "objeto": "personal",
+          "atributo": "contacto_crudo_cocido",
+          "operador": "=",
+          "valor": true,
+          "descripcion": "Hubo contacto directo o indirecto entre alimento crudo y cocido listo para consumo"
+        },
+        {
+          "objeto": "personal",
+          "atributo": "lavo_manos",
+          "operador": "=",
+          "valor": false,
+          "descripcion": "El operario NO se lavó las manos entre manipular crudo y cocido"
+        },
+        {
+          "objeto": "alimento",
+          "atributo": "tipo",
+          "operador": "=",
+          "valor": "cocido_listo",
+          "descripcion": "El alimento afectado es cocido listo para consumo sin cocción adicional"
+        }
+      ],
+      "conclusion": {
+        "diagnostico": {
+          "contaminacion_cruzada": true
+        }
+      },
+      "nivel_riesgo": "CRÍTICO",
+      "prioridad": 10,
+      "acciones": [
+        "Retirar y desechar INMEDIATAMENTE el alimento cocido potencialmente contaminado",
+        "Limpiar y desinfectar todas las superficies y utensilios involucrados",
+        "Capacitar al operario en el procedimiento correcto de lavado de manos",
+        "Implementar control visual de higiene de manos antes de manipular alimentos listos",
+        "Registrar el incidente y las acciones correctivas tomadas"
+      ],
+      "normativa": ["CAA", "BPM"],
+      "origen": "EXTRAIDA",
+      "explicacion": "La contaminación cruzada entre alimento crudo y cocido listo para consumo es una de las principales causas de ETA. El alimento crudo contiene patógenos que la cocción destruyó; al contaminarse el cocido, esos patógenos se transfieren sin que haya un paso de cocción posterior que los elimine.",
+      "comentario": "Este es el escenario de mayor riesgo en una rotisería: carne cruda con Salmonella o E. coli contamina el pollo cocido listo para servir. No hay barrera posterior de eliminación de patógenos — el consumidor come el producto contaminado directamente."
+    },
+    {
+      "id": "R08",
+      "nombre": "Deterioro organoléptico del alimento (olor, color o textura anormal)",
+      "modulo": "contaminacion",
+      "condiciones": [
+        {
+          "objeto": "alimento",
+          "atributo": "estado_organo",
+          "operador": "in",
+          "valor": ["olor_anormal", "color_alterado", "textura_anormal"],
+          "descripcion": "El alimento presenta signos organolépticos de deterioro (olor, color o textura anormal)"
+        }
+      ],
+      "conclusion": {
+        "diagnostico": {
+          "deterioro_organoleptico": true
+        }
+      },
+      "nivel_riesgo": "CRÍTICO",
+      "prioridad": 10,
+      "acciones": [
+        "Retirar INMEDIATAMENTE el alimento de la venta y exhibición",
+        "Decomisar el producto — no intentar recuperarlo ni reutilizarlo",
+        "Registrar el incidente de calidad con descripción del defecto observado",
+        "Investigar la causa del deterioro (cadena de frío, vencimiento, contaminación)",
+        "Revisar lotes del mismo proveedor y fecha que puedan estar igualmente afectados"
+      ],
+      "normativa": ["CAA"],
+      "origen": "EXTRAIDA",
+      "explicacion": "Los signos organolépticos alterados (olor a podrido, color verdoso/negruzco, textura viscosa o desintegrada) son indicadores directos de deterioro microbiano o químico avanzado. Un alimento con estas características representa un riesgo inaceptable para el consumidor, independientemente de la fecha de vencimiento o la temperatura.",
+      "comentario": "Este es el CASO LÍMITE CRÍTICO del sistema (Caso 6 de prueba): aunque la fecha de vencimiento sea vigente y la temperatura sea correcta (4°C), el olor anormal tiene PRIORIDAD ABSOLUTA. Los datos numéricos correctos no 'compensan' una señal organoléptica negativa."
+    },
+    {
+      "id": "R09",
+      "nombre": "Manipulación de alimento listo sin lavado de manos previo",
+      "modulo": "contaminacion",
+      "condiciones": [
+        {
+          "objeto": "personal",
+          "atributo": "lavo_manos",
+          "operador": "=",
+          "valor": false,
+          "descripcion": "El operario NO realizó el lavado de manos antes de manipular"
+        },
+        {
+          "objeto": "personal",
+          "atributo": "va_a_manipular_listo",
+          "operador": "=",
+          "valor": true,
+          "descripcion": "El operario va a manipular un alimento listo para consumo"
+        }
+      ],
+      "conclusion": {
+        "diagnostico": {
+          "sin_higiene_manos": true
+        }
+      },
+      "nivel_riesgo": "ALTO",
+      "prioridad": 8,
+      "acciones": [
+        "Detener la manipulación inmediatamente",
+        "Indicar al operario el procedimiento correcto de lavado de manos (20 segundos con jabón)",
+        "Supervisar la correcta ejecución del lavado antes de permitir retomar la tarea",
+        "Verificar disponibilidad de jabón, agua caliente y toallas descartables en el área"
+      ],
+      "normativa": ["BPM"],
+      "origen": "EXTRAIDA",
+      "explicacion": "Las manos del personal son el principal vehículo de contaminación microbiológica en la manipulación de alimentos. El lavado de manos es la medida de higiene más efectiva y de menor costo disponible en cualquier establecimiento.",
+      "comentario": "Regla preventiva fundamental: actúa ANTES de que ocurra la contaminación (a diferencia de R07 que actúa después). El costo de detener al operario 30 segundos para lavarse las manos es incomparablemente menor al de un brote de ETA."
+    },
+    {
+      "id": "R10",
+      "nombre": "Uso compartido de utensilios sin limpieza y desinfección entre usos",
+      "modulo": "contaminacion",
+      "condiciones": [
+        {
+          "objeto": "utensilio",
+          "atributo": "compartido_sin_lavar",
+          "operador": "=",
+          "valor": true,
+          "descripcion": "Se utilizaron utensilios (tablas, cuchillos, bandejas) para crudo y cocido sin lavarlos entre usos"
+        }
+      ],
+      "conclusion": {
+        "diagnostico": {
+          "utensilio_contaminante": true
+        }
+      },
+      "nivel_riesgo": "ALTO",
+      "prioridad": 8,
+      "acciones": [
+        "Separar inmediatamente los utensilios para alimentos crudos y cocidos",
+        "Limpiar y desinfectar TODOS los utensilios que hayan sido usados de forma cruzada",
+        "Implementar sistema de identificación de utensilios por colores (rojo=crudo, verde=cocido)",
+        "Capacitar a todo el personal en la separación de utensilios",
+        "Verificar que los racks y cajones de utensilios también estén separados físicamente"
+      ],
+      "normativa": ["BPM"],
+      "origen": "EXTRAIDA",
+      "explicacion": "Los utensilios compartidos entre alimentos crudos y cocidos son un vehículo directo de contaminación cruzada. Una tabla de corte que tocó carne cruda con Salmonella y luego se usa para el pollo cocido transfiere los patógenos al alimento final.",
+      "comentario": "El sistema de colores para utensilios es una de las medidas de BPM más visuales y efectivas. En la práctica de rotisería, la confusión de utensilios es uno de los errores más frecuentes, especialmente en horarios de alta demanda."
+    },
+    {
+      "id": "R11",
+      "nombre": "Cuerpo extraño detectado en alimento en venta",
+      "modulo": "contaminacion",
+      "condiciones": [
+        {
+          "objeto": "alimento",
+          "atributo": "cuerpo_extrano",
+          "operador": "=",
+          "valor": true,
+          "descripcion": "Se detectó un cuerpo extraño (vidrio, metal, plástico, insecto, etc.) en el alimento"
+        },
+        {
+          "objeto": "alimento",
+          "atributo": "en_venta",
+          "operador": "=",
+          "valor": true,
+          "descripcion": "El alimento con el cuerpo extraño está disponible para la venta al consumidor"
+        }
+      ],
+      "conclusion": {
+        "diagnostico": {
+          "cuerpo_extrano_detectado": true
+        }
+      },
+      "nivel_riesgo": "CRÍTICO",
+      "prioridad": 10,
+      "acciones": [
+        "Retirar INMEDIATAMENTE el alimento afectado de la venta",
+        "Decomisar todo el lote potencialmente afectado — no solo la unidad visible",
+        "Investigar el origen del cuerpo extraño (equipo, embalaje, proceso)",
+        "Registrar el incidente con descripción detallada del cuerpo extraño",
+        "Notificar al jefe inmediato y al área de calidad",
+        "Si el cuerpo extraño es vidrio o metal, evaluar riesgo para consumidores previos"
+      ],
+      "normativa": ["CAA"],
+      "origen": "EXTRAIDA",
+      "explicacion": "La presencia de cuerpos extraños (materias extrañas) en alimentos representa un riesgo físico directo para el consumidor: lesiones en boca, garganta, tubo digestivo. El nivel CRÍTICO refleja que el daño puede ser inmediato si el producto llega al consumidor.",
+      "comentario": "Los cuerpos extraños más peligrosos son vidrio y metal por su capacidad de causar lesiones internas. Plástico e insectos, aunque no corten, representan adulteración del alimento. En todos los casos la acción es retirar y decomisar."
+    }
+  ]
+}

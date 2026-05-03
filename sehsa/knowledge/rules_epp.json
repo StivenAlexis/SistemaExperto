@@ -1,0 +1,162 @@
+{
+  "modulo": "epp",
+  "descripcion": "Reglas del módulo de seguridad laboral y EPP — Equipos de Protección Personal (R12-R15). Evalúan uso correcto de EPP, ergonomía, condiciones del área y accidentes laborales.",
+  "reglas": [
+    {
+      "id": "R12",
+      "nombre": "Trabajo con hipoclorito sin equipo de protección personal",
+      "modulo": "epp",
+      "condiciones": [
+        {
+          "objeto": "personal",
+          "atributo": "usa_epp",
+          "operador": "=",
+          "valor": false,
+          "descripcion": "El operario NO está usando los EPP correspondientes a la tarea"
+        },
+        {
+          "objeto": "establecimiento",
+          "atributo": "area",
+          "operador": "=",
+          "valor": "limpieza",
+          "descripcion": "La tarea se realiza en el área de limpieza o saneamiento"
+        },
+        {
+          "objeto": "quimico",
+          "atributo": "tipo",
+          "operador": "=",
+          "valor": "hipoclorito",
+          "descripcion": "El químico utilizado es hipoclorito de sodio (lavandina/cloro)"
+        }
+      ],
+      "conclusion": {
+        "diagnostico": {
+          "sin_epp_quimico": true
+        }
+      },
+      "nivel_riesgo": "ALTO",
+      "prioridad": 8,
+      "acciones": [
+        "Detener la tarea de limpieza inmediatamente",
+        "Proveer al operario los EPP correspondientes: guantes de goma, protección ocular (antiparras) y delantal impermeable",
+        "Verificar si el operario sufrió lesiones (irritación ocular, cutánea o respiratoria)",
+        "Capacitar al operario en el manejo seguro del hipoclorito y el uso obligatorio de EPP",
+        "Registrar el incidente en el parte diario de seguridad"
+      ],
+      "normativa": ["Ley 19587 de Higiene y Seguridad en el Trabajo", "Decreto 351/79"],
+      "origen": "EXTRAIDA",
+      "explicacion": "El hipoclorito de sodio es un oxidante fuerte que puede causar irritación severa en piel, ojos y mucosas. La exposición sin protección adecuada es un riesgo laboral real y concreto, con daño potencial inmediato. El EPP adecuado (guantes, antiparras) es la barrera de protección mínima obligatoria.",
+      "comentario": "En la práctica de supermercados, la limpieza con hipoclorito es una tarea diaria. La tentación de 'hacerlo rápido' sin ponerse los guantes es frecuente. Esta regla actúa sobre ese riesgo concreto que la Ing. Marturet identificó como recurrente en el establecimiento."
+    },
+    {
+      "id": "R13",
+      "nombre": "Levantamiento manual de cargas sin técnica correcta",
+      "modulo": "epp",
+      "condiciones": [
+        {
+          "objeto": "personal",
+          "atributo": "levanta_cargas_sin_tecnica",
+          "operador": "=",
+          "valor": true,
+          "descripcion": "El operario levanta cargas manualmente sin aplicar la técnica ergonómica correcta"
+        }
+      ],
+      "conclusion": {
+        "diagnostico": {
+          "riesgo_ergonomico": true
+        }
+      },
+      "nivel_riesgo": "MEDIO",
+      "prioridad": 4,
+      "acciones": [
+        "Indicar al operario la técnica correcta de levantamiento: doblar rodillas, espalda recta, carga pegada al cuerpo",
+        "Evaluar si la carga supera los 25 kg (límite recomendado por Resolución 295/03)",
+        "Evaluar la incorporación de ayuda mecánica (zorra, carretilla, apilador)",
+        "Planificar capacitación ergonómica para todo el personal que manipula cargas"
+      ],
+      "normativa": ["Resolución 295/03 — Ergonomía", "Ley 19587 de Higiene y Seguridad en el Trabajo"],
+      "origen": "EXTRAIDA",
+      "explicacion": "El levantamiento incorrecto de cargas es la principal causa de lesiones musculoesqueléticas en el sector comercio alimentario. Las lesiones de columna lumbar son acumulativas y pueden ser permanentes, representando un alto costo humano y laboral.",
+      "comentario": "Riesgo MEDIO porque el daño es diferido (no inmediato como el hipoclorito en ojos), pero con alta probabilidad de ocurrencia y consecuencias graves a mediano plazo. En depósitos de supermercado, el manejo de cajas y bultos es una tarea diaria de alto volumen."
+    },
+    {
+      "id": "R14",
+      "nombre": "Piso húmedo sin señalización en área de circulación",
+      "modulo": "epp",
+      "condiciones": [
+        {
+          "objeto": "piso",
+          "atributo": "humedo",
+          "operador": "=",
+          "valor": true,
+          "descripcion": "El piso está húmedo (por limpieza, derrame u otra causa)"
+        },
+        {
+          "objeto": "senalizacion",
+          "atributo": "presente",
+          "operador": "=",
+          "valor": false,
+          "descripcion": "El área húmeda NO está señalizada con cartel de 'Piso Mojado'"
+        },
+        {
+          "objeto": "establecimiento",
+          "atributo": "area",
+          "operador": "=",
+          "valor": "circulacion",
+          "descripcion": "El piso húmedo está en un área de circulación de personas"
+        }
+      ],
+      "conclusion": {
+        "diagnostico": {
+          "riesgo_caida": true
+        }
+      },
+      "nivel_riesgo": "ALTO",
+      "prioridad": 7,
+      "acciones": [
+        "Señalizar el área húmeda INMEDIATAMENTE con cartel de 'Piso Mojado' visible desde ambos lados",
+        "Colocar barreras físicas para desviar la circulación si es posible",
+        "Secar la superficie lo antes posible",
+        "Verificar que el personal del área cuente con calzado antideslizante",
+        "Evaluar si la causa del piso húmedo es un derrame que requiere investigación"
+      ],
+      "normativa": ["Ley 19587 de Higiene y Seguridad en el Trabajo", "Decreto 351/79"],
+      "origen": "EXTRAIDA",
+      "explicacion": "Las caídas en piso mojado son uno de los accidentes laborales más frecuentes en comercios alimentarios. Sin señalización, el trabajador o cliente no puede anticipar el riesgo. La señalización inmediata es la medida preventiva más simple y efectiva.",
+      "comentario": "Las caídas en piso mojado causan desde contusiones hasta fracturas graves. En supermercados, la limpieza durante horario de operación (incluyendo pasillos) es frecuente. La señalización es el control mínimo obligatorio y de costo casi nulo."
+    },
+    {
+      "id": "R15",
+      "nombre": "Accidente laboral ocurrido en el establecimiento",
+      "modulo": "epp",
+      "condiciones": [
+        {
+          "objeto": "incidente",
+          "atributo": "accidente_laboral",
+          "operador": "=",
+          "valor": true,
+          "descripcion": "Ocurrió un accidente laboral que afectó a un trabajador del establecimiento"
+        }
+      ],
+      "conclusion": {
+        "diagnostico": {
+          "accidente_registrado": true
+        }
+      },
+      "nivel_riesgo": "ALTO",
+      "prioridad": 7,
+      "acciones": [
+        "Atender al operario lesionado — prioridad absoluta sobre cualquier tarea operativa",
+        "Llamar al servicio médico si la lesión lo requiere",
+        "Registrar el accidente en el libro de accidentes correspondiente (obligatorio por ley)",
+        "Preservar la escena del accidente para la investigación de causas",
+        "Evaluar las causas raíz del accidente (técnicas, organizacionales, humanas)",
+        "Implementar medidas correctivas y preventivas para evitar recurrencia"
+      ],
+      "normativa": ["Ley 19587 de Higiene y Seguridad en el Trabajo"],
+      "origen": "EXTRAIDA",
+      "explicacion": "Todo accidente laboral, independientemente de su gravedad aparente, debe ser registrado e investigado. La investigación de causas es el mecanismo principal de prevención de accidentes futuros. El registro es además una obligación legal.",
+      "comentario": "La Ley 19587 obliga al registro de todos los accidentes. La investigación de causas (no para buscar culpables, sino para identificar fallas del sistema) es la herramienta más valiosa de la gestión de seguridad laboral."
+    }
+  ]
+}

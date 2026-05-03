@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SEHSA — Sistema Experto en Higiene y Seguridad Alimentaria</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+  <!-- =========================================================
+       ENCABEZADO GLOBAL (siempre visible)
+       ========================================================= -->
+  <header class="header">
+    <div>
+      <div class="header-logo">SEH<span>SA</span></div>
+      <div class="header-subtitulo">Sistema Experto en Higiene y Seguridad Alimentaria</div>
+    </div>
+    <nav class="header-nav">
+      <button id="btn-header-inicio">Inicio</button>
+      <button id="btn-header-nueva">Nueva consulta</button>
+      <button id="btn-historial-desde-menu">Historial</button>
+    </nav>
+  </header>
+
+  <!-- =========================================================
+       PANTALLA 1 — INICIO
+       ========================================================= -->
+  <section class="pantalla" id="pantalla-inicio">
+    <div class="contenedor">
+
+      <div class="intro-hero">
+        <h1>SEHSA</h1>
+        <p class="sub">
+          Sistema Experto en Higiene y Seguridad Alimentaria<br>
+          Diagnóstico inteligente de situaciones de riesgo en establecimientos alimentarios
+        </p>
+        <button class="btn btn-acento" id="btn-iniciar-consulta" style="font-size:1.1rem;padding:14px 32px;">
+          Iniciar nueva consulta
+        </button>
+        <p class="autor">
+          Base de conocimiento: Ing. Carolina G. Marturet — Ingeniera en Alimentos<br>
+          Responsable de Rotisería — Supermercado Parada Canga
+        </p>
+      </div>
+
+      <div class="tarjeta">
+        <h2 class="subtitulo">¿Qué puede hacer SEHSA?</h2>
+        <div class="grid-2">
+          <div>
+            <p style="margin-bottom:8px;"><strong>🌡️ Cadena de frío</strong></p>
+            <p style="font-size:.9rem;color:#555;">Evalúa temperatura, equipos de refrigeración y recepción de mercadería.</p>
+          </div>
+          <div>
+            <p style="margin-bottom:8px;"><strong>🦠 Contaminación cruzada</strong></p>
+            <p style="font-size:.9rem;color:#555;">Detecta riesgos de contaminación por higiene del personal y utensilios.</p>
+          </div>
+          <div>
+            <p style="margin-bottom:8px;"><strong>🦺 Seguridad laboral</strong></p>
+            <p style="font-size:.9rem;color:#555;">Identifica falta de EPP, riesgos ergonómicos y condiciones inseguras.</p>
+          </div>
+          <div>
+            <p style="margin-bottom:8px;"><strong>🐀 Control de plagas</strong></p>
+            <p style="font-size:.9rem;color:#555;">Evalúa presencia de vectores y estado del programa de control.</p>
+          </div>
+          <div>
+            <p style="margin-bottom:8px;"><strong>📋 Documentación</strong></p>
+            <p style="font-size:.9rem;color:#555;">Verifica registros de temperatura, rotulación y trazabilidad.</p>
+          </div>
+          <div>
+            <p style="margin-bottom:8px;"><strong>⚠️ Incertidumbre</strong></p>
+            <p style="font-size:.9rem;color:#555;">Maneja datos faltantes y deriva urgencias fuera del alcance del sistema.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="tarjeta" style="text-align:center;">
+        <button class="btn btn-gris" id="btn-ver-historial">
+          📁 Ver historial de casos anteriores
+        </button>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- =========================================================
+       PANTALLA 2 — SELECCIÓN DE PERFIL
+       ========================================================= -->
+  <section class="pantalla" id="pantalla-perfil">
+    <div class="contenedor">
+      <div class="tarjeta">
+        <h1 class="titulo-pantalla">¿Cuál es su perfil?</h1>
+        <p class="descripcion-pantalla">
+          El sistema adapta el nivel de detalle de la explicación según su perfil.
+          Seleccione el que mejor lo describe.
+        </p>
+        <div class="grid-2" id="grid-perfiles"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================
+       PANTALLA 3 — SELECCIÓN DE MÓDULO
+       ========================================================= -->
+  <section class="pantalla" id="pantalla-modulo">
+    <div class="contenedor">
+      <div class="tarjeta">
+        <h1 class="titulo-pantalla">¿Qué situación desea evaluar?</h1>
+        <p class="descripcion-pantalla">
+          Seleccione el área relacionada con la situación que quiere consultar.
+          Si no está seguro, elija "Evaluación general" para evaluar todos los módulos.
+        </p>
+        <div class="grid-2" id="grid-modulos"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================
+       PANTALLA 4 — FORMULARIO DE CARGA DE HECHOS
+       ========================================================= -->
+  <section class="pantalla" id="pantalla-formulario">
+    <div class="contenedor">
+      <div class="tarjeta">
+        <h1 class="titulo-pantalla" id="titulo-formulario">Cargar datos del caso</h1>
+        <p class="descripcion-pantalla">
+          Responda las preguntas con la información del caso actual.
+          Las preguntas marcadas como <span style="background:#C0392B;color:white;padding:1px 6px;border-radius:8px;font-size:.75rem;">Requerido</span>
+          son necesarias para el diagnóstico.
+        </p>
+
+        <!-- Barra de progreso -->
+        <p class="progreso-texto" id="progreso-texto">0 de 0 preguntas respondidas</p>
+        <div class="progreso-barra">
+          <div class="progreso-fill" id="progreso-fill" style="width:0%"></div>
+        </div>
+
+        <!-- Preguntas dinámicas -->
+        <div id="contenedor-preguntas"></div>
+
+        <!-- Loader -->
+        <div class="loader" id="loader-consulta">
+          <div class="spinner"></div>
+          <p>Consultando al motor de inferencia...</p>
+        </div>
+
+        <!-- Botón de envío -->
+        <div style="margin-top:24px;">
+          <button class="btn btn-acento" id="btn-consultar" style="font-size:1rem;padding:14px 28px;">
+            🔍 Consultar al sistema
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================
+       PANTALLA 5 — RESULTADO Y DIAGNÓSTICO
+       ========================================================= -->
+  <section class="pantalla" id="pantalla-resultado">
+    <div class="contenedor">
+
+      <!-- Alerta especial ETA (oculta por defecto) -->
+      <div class="alerta-eta" id="alerta-eta-resultado" style="display:none;">
+        <div class="eta-icono">🚨</div>
+        <div class="eta-titulo">CASO FUERA DEL ALCANCE — DERIVACIÓN URGENTE</div>
+        <div class="eta-subtitulo">
+          Se detecta sospecha de Enfermedad Transmitida por Alimentos (ETA).<br>
+          El sistema NO emite diagnóstico para este caso.<br>
+          <strong>Derivar INMEDIATAMENTE a médico y autoridad sanitaria competente.</strong>
+        </div>
+      </div>
+
+      <!-- Panel de nivel de riesgo -->
+      <div class="panel-riesgo bajo" id="panel-nivel-riesgo">
+        <div class="nivel-texto" id="nivel-riesgo-texto">BAJO</div>
+        <div class="nivel-desc" id="nivel-riesgo-desc"></div>
+      </div>
+
+      <!-- Diagnóstico -->
+      <div class="tarjeta">
+        <h2 class="subtitulo">Diagnóstico</h2>
+        <p id="texto-diagnostico" style="line-height:1.6;"></p>
+      </div>
+
+      <!-- Advertencias -->
+      <div id="contenedor-advertencias-resultado"></div>
+
+      <!-- Datos faltantes (RI-05) -->
+      <div class="bloque-faltantes" id="contenedor-datos-faltantes" style="display:none;">
+        <strong>ℹ️ Diagnóstico con datos incompletos:</strong>
+        Faltan datos opcionales que mejorarían la precisión:
+        <span id="texto-datos-faltantes"></span>
+      </div>
+
+      <!-- Acciones recomendadas -->
+      <div class="tarjeta">
+        <h2 class="subtitulo">Acciones Recomendadas</h2>
+        <ol class="lista-acciones" id="lista-acciones-resultado"></ol>
+      </div>
+
+      <!-- Botones de acción -->
+      <div class="acciones-resultado">
+        <button class="btn btn-primario" id="btn-ver-explicacion">
+          🔎 Ver explicación detallada
+        </button>
+        <button class="btn btn-acento" id="btn-nueva-consulta">
+          🔄 Nueva consulta
+        </button>
+        <button class="btn btn-gris" id="btn-guardar-caso">
+          💾 Guardar caso
+        </button>
+        <button class="btn btn-gris" id="btn-imprimir">
+          🖨️ Imprimir reporte
+        </button>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- =========================================================
+       PANTALLA 6 — EXPLICACIÓN DETALLADA
+       ========================================================= -->
+  <section class="pantalla" id="pantalla-explicacion">
+    <div class="contenedor">
+
+      <div class="tarjeta">
+        <h1 class="titulo-pantalla">Explicación Detallada</h1>
+        <p class="descripcion-pantalla">
+          Aquí puede ver exactamente qué datos ingresó, qué reglas se activaron
+          y por qué el sistema llegó a esta conclusión.
+        </p>
+
+        <!-- Hechos ingresados -->
+        <h2 class="subtitulo" style="margin-top:4px;">Datos que ingresó</h2>
+        <table class="tabla-historial" id="tabla-hechos-explicacion">
+          <thead>
+            <tr>
+              <th>Dato</th>
+              <th>Valor</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+
+        <hr class="separador">
+
+        <!-- Reglas activadas -->
+        <h2 class="subtitulo">Reglas que se activaron</h2>
+        <div id="contenedor-reglas-explicacion"></div>
+
+        <hr class="separador">
+
+        <!-- Normativa aplicada -->
+        <h2 class="subtitulo">Normativa aplicada</h2>
+        <p id="texto-normativa" style="color:#555;line-height:1.6;"></p>
+
+        <hr class="separador">
+
+        <!-- Justificación -->
+        <h2 class="subtitulo">Justificación del diagnóstico</h2>
+        <p id="texto-justificacion" style="color:#555;line-height:1.6;"></p>
+
+        <!-- Resumen ejecutivo (solo gerente) -->
+        <div id="bloque-resumen-ejecutivo" style="display:none;">
+          <hr class="separador">
+          <h2 class="subtitulo">Resumen ejecutivo</h2>
+          <div class="tarjeta" style="background:#EBF5FB;border:1px solid #AED6F1;">
+            <p id="texto-resumen-ejecutivo" style="line-height:1.6;"></p>
+          </div>
+        </div>
+
+        <div style="margin-top:20px;" class="no-imprimir">
+          <button class="btn btn-gris" id="btn-volver-resultado">
+            ← Volver al resultado
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- =========================================================
+       PANTALLA 7 — HISTORIAL DE CASOS
+       ========================================================= -->
+  <section class="pantalla" id="pantalla-historial">
+    <div class="contenedor">
+      <div class="tarjeta">
+        <h1 class="titulo-pantalla">Historial de Casos</h1>
+        <p class="descripcion-pantalla">
+          Registro de todos los casos evaluados y guardados en esta instalación del sistema.
+        </p>
+
+        <div id="historial-vacio" style="display:none;text-align:center;color:#888;padding:20px;">
+          No hay casos guardados aún. Los casos guardados desde "Resultado" aparecerán aquí.
+        </div>
+
+        <div style="overflow-x:auto;">
+          <table class="tabla-historial">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Fecha</th>
+                <th>Módulo</th>
+                <th>Riesgo</th>
+                <th>Diagnóstico</th>
+                <th>Reglas</th>
+              </tr>
+            </thead>
+            <tbody id="tabla-historial-body">
+              <tr><td colspan="6" style="text-align:center;color:#888;">Cargando...</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div style="margin-top:20px;">
+          <button class="btn btn-gris" id="btn-volver-desde-historial">
+            ← Volver al inicio
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
