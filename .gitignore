@@ -1,0 +1,53 @@
+# Claude Code
+.claude/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg
+*.egg-info/
+dist/
+build/
+eggs/
+parts/
+var/
+sdist/
+develop-eggs/
+.installed.cfg
+lib/
+lib64/
+
+# Entornos virtuales
+.env
+.venv
+env/
+venv/
+ENV/
+
+# Variables de entorno / secretos
+.env
+.env.*
+*.env
+secrets.json
+config.local.py
+
+# Historial de casos (datos de producción, no código)
+sehsa/data/historial_casos.json
+
+# IDEs
+.vscode/
+.idea/
+*.suo
+*.user
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+logs/
