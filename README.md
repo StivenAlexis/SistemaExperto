@@ -3,6 +3,8 @@
 Sistema experto basado en encadenamiento hacia adelante para diagnóstico de riesgos en establecimientos de alimentos (supermercados, rotiserías). Desarrollado como proyecto académico de Sistemas Inteligentes.
 
 ---
+lINK PARA PROBAR 
+https://sistemaexperto-sehsa.onrender.com/
 
 ## Descripción
 
