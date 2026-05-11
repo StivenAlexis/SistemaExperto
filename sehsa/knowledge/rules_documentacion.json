@@ -6,6 +6,7 @@
       "id": "R19",
       "nombre": "Ausencia de registros de temperatura con perecederos almacenados",
       "modulo": "documentacion",
+      "tipo_patron": "proceso",
       "condiciones": [
         {
           "objeto": "documentacion",
@@ -35,6 +36,13 @@
         "Capacitar al personal responsable en el registro correcto de temperaturas",
         "Establecer procedimiento de acción ante desvíos de temperatura detectados en el registro"
       ],
+      "acciones_operario": [
+        "Mirá el estado de los alimentos que están en frío — ¿huelen bien, se ven bien?",
+        "Avisale al encargado que no se están anotando las temperaturas.",
+        "Pedile al encargado una planilla para empezar a registrarlas hoy.",
+        "Anotá la temperatura de las heladeras ahora como primer registro del día."
+      ],
+      "revisar": true,
       "normativa": ["BPM", "POES"],
       "origen": "EXTRAIDA",
       "explicacion": "Los registros de temperatura son la evidencia documental que permite demostrar el mantenimiento de la cadena de frío. Sin registros, no hay forma de verificar que los alimentos estuvieron a temperatura segura. La ausencia de registros es en sí misma una no conformidad grave en BPM.",
@@ -44,6 +52,7 @@
       "id": "R20",
       "nombre": "Rotulación incorrecta o ausente en producto en exhibición",
       "modulo": "documentacion",
+      "tipo_patron": "proceso",
       "condiciones": [
         {
           "objeto": "documentacion",
@@ -73,6 +82,12 @@
         "Volver a exhibir el producto solo después de verificar que la rotulación es correcta y completa",
         "Verificar si el error de rotulación es sistémico (afecta a todo el lote o proveedor)"
       ],
+      "acciones_operario": [
+        "Sacá ese producto del mostrador o la góndola.",
+        "No lo vendas hasta que el encargado lo revise.",
+        "Avisale al encargado qué producto es y por qué lo retiraste (le falta etiqueta, está incorrecta, etc.)."
+      ],
+      "revisar": true,
       "normativa": ["CAA Artículo 235 bis", "Ley 18284"],
       "origen": "EXTRAIDA",
       "explicacion": "La rotulación incorrecta puede inducir al consumidor a error sobre ingredientes, alérgenos, vencimiento o condiciones de conservación. Es una no conformidad legal que puede derivar en sanciones. La información de alérgenos en particular puede ser crítica para consumidores con alergias.",
@@ -82,6 +97,7 @@
       "id": "R21",
       "nombre": "Sospecha de Enfermedad Transmitida por Alimentos — FUERA DE ALCANCE",
       "modulo": "documentacion",
+      "tipo_patron": "informativo",
       "condiciones": [
         {
           "objeto": "incidente",
@@ -107,6 +123,13 @@
         "No manipular ni desechar ningún alimento hasta que las autoridades lo indiquen",
         "Registrar los datos de las personas afectadas para la investigación epidemiológica"
       ],
+      "acciones_operario": [
+        "Avisale al encargado URGENTE que hay personas enfermas.",
+        "Llamá a emergencias si alguien necesita atención médica ya.",
+        "No tires ni muevas ningún alimento — las autoridades lo van a necesitar.",
+        "El sistema no puede ayudarte con esto — necesitás un médico y la autoridad sanitaria."
+      ],
+      "revisar": true,
       "normativa": ["CAA", "Ley 18284", "SENASA", "Autoridad sanitaria jurisdiccional"],
       "origen": "INFERIDA",
       "explicacion": "Este caso trasciende el alcance del sistema experto SEHSA. La sospecha de ETA (personas enfermas por consumo de alimentos) es una emergencia sanitaria que requiere médicos y autoridades, no un sistema de recomendaciones operativas. El motor se detiene completamente ante esta situación.",

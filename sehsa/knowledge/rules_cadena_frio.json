@@ -6,6 +6,7 @@
       "id": "R01",
       "nombre": "Rotura de cadena de frío en alimento perecedero",
       "modulo": "cadena_frio",
+      "tipo_patron": "proceso",
       "condiciones": [
         {
           "objeto": "temperatura",
@@ -43,6 +44,13 @@
         "Implementar registro de temperatura con frecuencia horaria hasta normalizar",
         "Notificar al responsable del establecimiento"
       ],
+      "acciones_operario": [
+        "Sacá todo ese alimento de la heladera o cámara ahora mismo.",
+        "No lo vendas ni lo uses — tiralo.",
+        "Avisale al encargado lo que pasó y anotá a qué hora lo encontraste.",
+        "No guardes nada en ese equipo hasta que lo revisen y arreglen."
+      ],
+      "revisar": true,
       "normativa": ["CAA Artículo de Refrigeración", "BPM"],
       "origen": "EXTRAIDA",
       "explicacion": "La temperatura del alimento supera los 5°C y la exposición fue prolongada o de tiempo desconocido. En la zona de peligro (5°C-60°C) las bacterias patógenas se multiplican rápidamente. Con 2 horas o más de exposición, la carga bacteriana puede superar límites seguros.",
@@ -52,6 +60,7 @@
       "id": "R02",
       "nombre": "Temperatura insuficiente en exhibidora caliente de alimentos cocidos",
       "modulo": "cadena_frio",
+      "tipo_patron": "estructural",
       "condiciones": [
         {
           "objeto": "equipo",
@@ -88,6 +97,13 @@
         "No vender ningún alimento hasta que la exhibidora alcance y mantenga 60°C o más",
         "Evaluar con criterio organoléptico si los alimentos pueden ser recalentados o deben descartarse"
       ],
+      "acciones_operario": [
+        "Sacá toda la comida de la exhibidora caliente ahora mismo.",
+        "No vendas nada de lo que estaba ahí.",
+        "Avisale al encargado que la exhibidora no está calentando bien.",
+        "Esperá a que marque 60°C o más antes de volver a poner comida."
+      ],
+      "revisar": true,
       "normativa": ["CAA", "BPM"],
       "origen": "EXTRAIDA",
       "explicacion": "Los alimentos cocidos listos para consumo deben mantenerse a 60°C o más para inhibir la proliferación bacteriana. Temperaturas por debajo de 60°C en la exhibidora crean zona de peligro activa mientras el alimento está expuesto al consumidor.",
@@ -97,6 +113,7 @@
       "id": "R03",
       "nombre": "Heladera sin funcionar por tiempo desconocido",
       "modulo": "cadena_frio",
+      "tipo_patron": "estructural",
       "condiciones": [
         {
           "objeto": "equipo",
@@ -134,6 +151,14 @@
         "Registrar el incidente detallando fecha, hora aproximada y productos afectados",
         "Contactar al servicio técnico de mantenimiento de equipos"
       ],
+      "acciones_operario": [
+        "Sacá todos los alimentos de esa heladera ahora.",
+        "Tirá todo lo que estaba adentro — no sabés cuánto tiempo estuvo apagada.",
+        "Avisale urgente al encargado.",
+        "Anotá qué alimentos había y a qué hora lo descubriste.",
+        "No uses esa heladera hasta que la arreglen."
+      ],
+      "revisar": true,
       "normativa": ["CAA", "BPM"],
       "origen": "EXTRAIDA",
       "explicacion": "Una heladera no funcionando por tiempo desconocido es el peor escenario de cadena de frío: los alimentos estuvieron expuestos a temperatura ambiente por un período indeterminado. Sin saber el tiempo transcurrido, no se puede garantizar la inocuidad de ningún alimento almacenado.",
@@ -143,6 +168,7 @@
       "id": "R04",
       "nombre": "Temperatura de cocción insuficiente en alimento de origen animal",
       "modulo": "cadena_frio",
+      "tipo_patron": "proceso",
       "condiciones": [
         {
           "objeto": "coccion",
@@ -172,6 +198,13 @@
         "Verificar la temperatura en el punto más frío con termómetro calibrado",
         "Para aves y cerdo, la temperatura mínima recomendada es 74°C"
       ],
+      "acciones_operario": [
+        "No saques esa comida del horno todavía — le falta cocción.",
+        "Seguí cocinando hasta que el termómetro marque más de 60°C en el centro.",
+        "Si es pollo o cerdo, esperá a que marque 74°C.",
+        "No lo sirvas ni lo vendas hasta que llegue a esa temperatura."
+      ],
+      "revisar": true,
       "normativa": ["CAA"],
       "origen": "EXTRAIDA",
       "explicacion": "La cocción a temperatura suficiente es el paso crítico de control (PCC) más importante para destruir patógenos en alimentos de origen animal. Temperaturas inferiores a 60°C no garantizan la eliminación de Salmonella, E. coli O157:H7 y otros patógenos.",
@@ -181,6 +214,7 @@
       "id": "R05",
       "nombre": "Reutilización segura de alimento cocido no vendido",
       "modulo": "cadena_frio",
+      "tipo_patron": "proceso",
       "condiciones": [
         {
           "objeto": "alimento",
@@ -217,6 +251,13 @@
         "Recalentar a temperatura de servicio (≥60°C) antes de volver a exhibir",
         "No reutilizar más de una vez el mismo alimento"
       ],
+      "acciones_operario": [
+        "Podés usar esa comida hoy, pero avisale al encargado antes.",
+        "Calentala hasta que marque 60°C o más antes de ponerla en el mostrador.",
+        "Anotá que la reutilizaste, con fecha y hora.",
+        "Si sobra de nuevo hoy, no la uses mañana."
+      ],
+      "revisar": true,
       "normativa": ["BPM"],
       "origen": "EXTRAIDA",
       "explicacion": "Un alimento cocido que se conservó correctamente (refrigerado o en caliente según corresponda) y se va a consumir el mismo día puede reutilizarse con supervisión. Las condiciones de conservación correcta mitigan el riesgo residual.",
@@ -226,6 +267,7 @@
       "id": "R06",
       "nombre": "Rechazo de lote por cadena de frío comprometida en recepción",
       "modulo": "cadena_frio",
+      "tipo_patron": "proceso",
       "condiciones": [
         {
           "objeto": "recepcion",
@@ -256,6 +298,13 @@
         "Registrar el incidente en el sistema de trazabilidad del establecimiento",
         "Comunicar la situación al área de compras para evaluación del proveedor"
       ],
+      "acciones_operario": [
+        "No recibas esa mercadería — mandala de vuelta al proveedor.",
+        "No firmes el remito sin que el encargado lo autorice primero.",
+        "Avisale al encargado que el producto llegó tibio o caliente.",
+        "Anotá el nombre del proveedor y la hora en que llegó."
+      ],
+      "revisar": true,
       "normativa": ["CAA", "BPM", "SENASA"],
       "origen": "EXTRAIDA",
       "explicacion": "La recepción de mercadería con cadena de frío comprometida (temperatura fuera de rango sin justificación del proveedor) representa un punto de entrada de alimentos potencialmente inseguros al establecimiento. El rechazo protege al consumidor final.",

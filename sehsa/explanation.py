@@ -148,9 +148,9 @@ class ExplanationSystem:
             'perfil':              self.perfil,
             'timestamp':           self.timestamp,
             'nivel_riesgo':        self.nivel_riesgo,
-            'descripcion_riesgo':  DESCRIPCIONES_RIESGO.get(self.nivel_riesgo, ''),
+            'descripcion_riesgo':  self._descripcion_riesgo_por_perfil(),
             'derivacion_urgente':  self.derivacion_urgente,
-            'diagnostico':         self.diagnostico,
+            'diagnostico':         self._diagnostico_por_perfil(),
             'hechos_ingresados':   self._formatear_hechos_usuario(),
             'reglas_activadas':    self._formatear_reglas_por_perfil(),
             'todas_las_acciones':  self._consolidar_acciones(),
@@ -362,6 +362,67 @@ class ExplanationSystem:
                     })
         return items
 
+    def _descripcion_riesgo_por_perfil(self) -> str:
+        """
+        Devuelve la descripción del nivel de riesgo adaptada al perfil.
+
+        Para operario: lenguaje imperativo y directo ("¡Actuá ahora!").
+        Para técnicos: terminología de inocuidad alimentaria / HACCP.
+
+        Returns:
+            str: Descripción del nivel de riesgo.
+        """
+        if self.perfil == 'operario':
+            return {
+                'CRÍTICO': 'PELIGRO ALTO — Actuá ahora mismo. No esperes.',
+                'ALTO':    'ATENCIÓN — Tomá medidas antes de seguir trabajando.',
+                'MEDIO':   'PRECAUCIÓN — Corregilo en las próximas horas.',
+                'BAJO':    'AVISO — Monitoreá y aplicá las medidas que indica el sistema.',
+            }.get(self.nivel_riesgo, '')
+        return DESCRIPCIONES_RIESGO.get(self.nivel_riesgo, '')
+
+    def _diagnostico_por_perfil(self) -> str:
+        """
+        Adapta el texto del diagnóstico al perfil del usuario.
+
+        Para operario: descripción observable, sin términos HACCP.
+        Para supervisor/profesional/gerente: terminología técnica completa.
+
+        Returns:
+            str: Texto del diagnóstico adaptado.
+        """
+        if not self.reglas_activadas:
+            if self.perfil == 'operario':
+                return (
+                    "No encontramos problemas con los datos que ingresaste. "
+                    "Seguí trabajando con las buenas prácticas de siempre."
+                )
+            return self.diagnostico
+
+        if self.perfil == 'operario':
+            nombres_simples = [r['nombre'] for r in self.reglas_activadas
+                               if r.get('modulo') != 'incertidumbre']
+            n = len(nombres_simples)
+            if n == 0:
+                return "El sistema detectó una situación que requiere atención."
+            lista = ', '.join(nombres_simples[:2]) + ('...' if n > 2 else '')
+            if self.nivel_riesgo == 'CRÍTICO':
+                return (
+                    f"Encontramos {n} problema(s) que necesitan atención inmediata: {lista}. "
+                    "Seguí las instrucciones de abajo ahora mismo."
+                )
+            if self.nivel_riesgo == 'ALTO':
+                return (
+                    f"Encontramos {n} problema(s) que hay que resolver antes de seguir: {lista}. "
+                    "Seguí las instrucciones de abajo."
+                )
+            return (
+                f"Encontramos {n} situación(es) a corregir en el corto plazo: {lista}."
+            )
+
+        # Perfiles técnicos: diagnóstico original del motor
+        return self.diagnostico
+
     def _formatear_reglas_por_perfil(self) -> list:
         """
         Filtra y formatea las reglas activadas según el perfil del usuario.
@@ -378,11 +439,12 @@ class ExplanationSystem:
         reglas = []
         for regla in self.reglas_activadas:
             if self.perfil == 'operario':
+                acciones = (regla.get('acciones_operario') or regla.get('acciones', []))
                 reglas.append({
                     'id':                 regla['id'],
                     'nombre':             regla['nombre'],
                     'nivel_riesgo':       regla.get('nivel_riesgo', ''),
-                    'acciones':           regla.get('acciones', []),
+                    'acciones':           acciones,
                     'condiciones_cumplidas': [],
                     'normativa':          [],
                     'explicacion':        ''
@@ -472,6 +534,9 @@ class ExplanationSystem:
         """
         Consolida todas las acciones de todas las reglas activadas en una lista única.
 
+        Para perfil 'operario' usa acciones_operario si están disponibles en la regla.
+        Para el resto de perfiles usa acciones (lenguaje técnico HACCP).
+
         Elimina duplicados manteniendo el orden de aparición (regla de mayor prioridad primero).
 
         Returns:
@@ -480,7 +545,11 @@ class ExplanationSystem:
         acciones_vistas = set()
         acciones_unicas = []
         for regla in self.reglas_activadas:
-            for accion in regla.get('acciones', []):
+            if self.perfil == 'operario' and regla.get('acciones_operario'):
+                fuente = regla.get('acciones_operario', [])
+            else:
+                fuente = regla.get('acciones', [])
+            for accion in fuente:
                 if accion not in acciones_vistas:
                     acciones_vistas.add(accion)
                     acciones_unicas.append(accion)
@@ -506,10 +575,19 @@ class ExplanationSystem:
         """
         Genera el texto de justificación explicando por qué el sistema llegó a la conclusión.
 
+        Para perfil 'operario': lenguaje simple, centrado en lo que el operario observó.
+        Para perfiles técnicos: terminología HACCP, IDs de reglas, módulos y normativa.
+
         Returns:
-            str: Texto de justificación en lenguaje natural.
+            str: Texto de justificación en lenguaje natural adaptado al perfil.
         """
         if self.derivacion_urgente:
+            if self.perfil == 'operario':
+                return (
+                    "El sistema detectó que hay personas enfermas. "
+                    "Esto está fuera de lo que puede diagnosticar esta herramienta. "
+                    "Necesitás un médico y las autoridades sanitarias."
+                )
             return (
                 "El sistema detectó sospecha de Enfermedad Transmitida por Alimentos (ETA). "
                 "Este caso está fuera del alcance del sistema experto SEHSA, que trabaja sobre "
@@ -518,12 +596,33 @@ class ExplanationSystem:
             )
 
         if not self.reglas_activadas:
+            if self.perfil == 'operario':
+                return (
+                    "Con los datos que ingresaste no se detectaron problemas. "
+                    "Seguí trabajando con las buenas prácticas de siempre."
+                )
             return (
                 "Ninguna regla de la base de conocimiento se activó con los datos proporcionados. "
                 "Esto puede indicar que las condiciones evaluadas están dentro de los parámetros "
                 "normales, o que faltan datos relevantes para evaluar alguna situación de riesgo."
             )
 
+        # Perfil operario: justificación en lenguaje observable
+        if self.perfil == 'operario':
+            observaciones = []
+            for regla in self.reglas_activadas:
+                expl = regla.get('explicacion', '')
+                if expl:
+                    # Solo la primera oración, sin jerga técnica en el resumen
+                    observaciones.append(expl.split('.')[0].strip() + '.')
+            if observaciones:
+                return (
+                    "Lo que observaste activó las siguientes alertas del sistema: "
+                    + ' '.join(observaciones[:2])
+                )
+            return "El sistema detectó situaciones de riesgo en base a lo que ingresaste."
+
+        # Perfiles técnicos: justificación con detalle HACCP
         ids_reglas = [r['id'] for r in self.reglas_activadas]
         modulos = list({ETIQUETAS_MODULO.get(r.get('modulo', ''), r.get('modulo', ''))
                         for r in self.reglas_activadas if r.get('modulo', '') != 'incertidumbre'})
@@ -536,7 +635,6 @@ class ExplanationSystem:
         if modulos:
             justif += f"Las áreas de riesgo identificadas corresponden a: {', '.join(modulos)}. "
 
-        # Agregar explicaciones de las reglas críticas
         reglas_criticas = [r for r in self.reglas_activadas if r.get('nivel_riesgo') == 'CRÍTICO']
         if reglas_criticas:
             justif += (

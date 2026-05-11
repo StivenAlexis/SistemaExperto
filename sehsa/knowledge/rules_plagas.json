@@ -6,6 +6,7 @@
       "id": "R16",
       "nombre": "Indicios de plagas con envases herméticos intactos sin contacto directo",
       "modulo": "plagas",
+      "tipo_patron": "estructural",
       "condiciones": [
         {
           "objeto": "plaga",
@@ -44,6 +45,14 @@
         "Limpiar y desinfectar el área afectada",
         "Registrar el incidente con descripción de la plaga observada y el área"
       ],
+      "acciones_operario": [
+        "No sigas sacando productos de esa zona.",
+        "Revisá uno por uno si los envases están enteros y sin agujeros.",
+        "Los que estén sin daños podés dejarlos; los que tengan daños los retirás.",
+        "Avisale al encargado que encontraste rastros de bichos o ratones.",
+        "Limpiá el área antes de volver a poner productos ahí."
+      ],
+      "revisar": true,
       "normativa": ["BPM", "POES"],
       "origen": "EXTRAIDA",
       "explicacion": "La presencia de indicios de plaga en un área con productos envasados herméticamente representa un riesgo ALTO pero manejable mediante inspección y segregación. El envase hermético intacto actúa como barrera de protección. La inspección individual determina si los productos pueden liberarse.",
@@ -53,6 +62,7 @@
       "id": "R17",
       "nombre": "Indicios de plagas con envases comprometidos (dañados o no herméticos)",
       "modulo": "plagas",
+      "tipo_patron": "estructural",
       "condiciones": [
         {
           "objeto": "plaga",
@@ -84,6 +94,14 @@
         "Registrar y documentar el incidente con fotografías si es posible",
         "Revisar el resto del depósito en búsqueda de áreas adicionales afectadas"
       ],
+      "acciones_operario": [
+        "Retirá todos los productos de esa zona ahora mismo.",
+        "No vendas nada de lo que estaba ahí — todo va al descarte.",
+        "No intentes limpiar el envase y venderlo igual.",
+        "Avisale urgente al encargado.",
+        "Limpiá y desinfectá toda el área antes de volver a usar ese espacio."
+      ],
+      "revisar": true,
       "normativa": ["CAA", "BPM"],
       "origen": "EXTRAIDA",
       "explicacion": "Cuando los envases están dañados o no son herméticos, la plaga tuvo acceso directo al alimento. El riesgo de contaminación biológica (patógenos de heces/orina de roedores, exoesqueleto de insectos) es CRÍTICO. No existe inspección que pueda garantizar la inocuidad — el decomiso es obligatorio.",
@@ -93,6 +111,7 @@
       "id": "R18",
       "nombre": "Control de plagas vencido con indicios activos",
       "modulo": "plagas",
+      "tipo_patron": "proceso",
       "condiciones": [
         {
           "objeto": "plaga",
@@ -122,6 +141,12 @@
         "Intensificar el monitoreo manual (trampas, registros de avistamiento) hasta la próxima visita",
         "Registrar la situación y la acción tomada en el libro de control de plagas"
       ],
+      "acciones_operario": [
+        "Avisale al encargado que hace más de un mes que no vino la empresa de control de plagas.",
+        "Mientras tanto, revisá si hay más señales de bichos o ratones en el local.",
+        "El encargado va a coordinar la visita urgente del servicio de control."
+      ],
+      "revisar": true,
       "normativa": ["BPM", "POES"],
       "origen": "EXTRAIDA",
       "explicacion": "Un programa de control de plagas con intervalos superiores a 30 días en presencia de indicios activos es insuficiente para contener la infestación. Los indicios activos con control vencido sugieren que la plaga no está siendo controlada eficazmente por el programa actual.",

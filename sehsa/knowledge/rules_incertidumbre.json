@@ -6,6 +6,7 @@
       "id": "RI-01",
       "nombre": "Tiempo de exposición desconocido en alimento perecedero",
       "modulo": "incertidumbre",
+      "tipo_patron": "informativo",
       "condiciones": [
         {
           "objeto": "exposicion",
@@ -35,6 +36,11 @@
         "Proceder como si la cadena de frío hubiera sido interrumpida",
         "Esta regla habilita la evaluación de R01 y R03"
       ],
+      "acciones_operario": [
+        "Como no sabés desde cuándo está así, tratalo como si llevara mucho tiempo sin frío.",
+        "Seguí las instrucciones del sistema para el alimento perecedero."
+      ],
+      "revisar": true,
       "normativa": ["CAA", "BPM"],
       "origen": "INCERTIDUMBRE",
       "explicacion": "Cuando el tiempo de exposición de un alimento perecedero es desconocido, el principio de precaución exige asumir el peor escenario posible (exposición prolongada). La conclusión 'riesgo_prolongado=True' habilita R01 y R03 en el ciclo principal.",
@@ -44,6 +50,7 @@
       "id": "RI-02",
       "nombre": "Temperatura no medida con estado organoléptico alterado",
       "modulo": "incertidumbre",
+      "tipo_patron": "proceso",
       "condiciones": [
         {
           "objeto": "temperatura",
@@ -73,6 +80,12 @@
         "Retirar el alimento de la venta de forma inmediata",
         "La señal organoléptica es evidencia suficiente de deterioro"
       ],
+      "acciones_operario": [
+        "El olor, color o textura ya te está avisando que el alimento está en mal estado.",
+        "No necesitás medir la temperatura — sacalo de la venta ahora mismo.",
+        "Tiralo y avisale al encargado."
+      ],
+      "revisar": true,
       "normativa": ["CAA", "BPM"],
       "origen": "INCERTIDUMBRE",
       "explicacion": "Si no hay termómetro pero el alimento presenta signos organolépticos alterados (olor anormal, color alterado o textura anormal), el nivel de riesgo es CRÍTICO. La señal sensorial directa es evidencia suficiente de deterioro sin necesidad de datos numéricos.",
@@ -82,6 +95,7 @@
       "id": "RI-03",
       "nombre": "Temperatura no medida con estado organoléptico normal",
       "modulo": "incertidumbre",
+      "tipo_patron": "proceso",
       "condiciones": [
         {
           "objeto": "temperatura",
@@ -110,6 +124,12 @@
         "Mostrar alerta: el diagnóstico está incompleto sin temperatura",
         "No continuar con la evaluación hasta obtener el dato de temperatura"
       ],
+      "acciones_operario": [
+        "Necesitás medir la temperatura antes de decidir qué hacer.",
+        "Buscá el termómetro y medí el alimento o el equipo.",
+        "Cuando tengas el número, volvé a ingresar el caso con ese dato."
+      ],
+      "revisar": true,
       "normativa": ["BPM"],
       "origen": "INCERTIDUMBRE",
       "explicacion": "Si el estado organoléptico parece normal pero no se midió la temperatura, el sistema no puede completar el diagnóstico. Los alimentos pueden estar en zona de peligro (5°C-60°C) sin señales organolépticas visibles. Se requiere la medición.",
@@ -119,6 +139,7 @@
       "id": "RI-04",
       "nombre": "Sospecha de Enfermedad Transmitida por Alimentos (ETA)",
       "modulo": "incertidumbre",
+      "tipo_patron": "informativo",
       "condiciones": [
         {
           "objeto": "incidente",
@@ -143,6 +164,13 @@
         "No consumir ningún alimento involucrado en el caso",
         "Aislar y preservar el área como escena de investigación sanitaria"
       ],
+      "acciones_operario": [
+        "Esto no lo puede resolver el sistema — avisale al encargado URGENTE.",
+        "Si alguien necesita atención médica, llamá a emergencias ya.",
+        "No tires ni muevas ningún alimento — las autoridades van a necesitar verlos.",
+        "Cerrá el área y esperá las instrucciones del encargado y de las autoridades."
+      ],
+      "revisar": true,
       "normativa": ["CAA", "Ley 18284", "SENASA", "Autoridad sanitaria local"],
       "origen": "INCERTIDUMBRE",
       "explicacion": "La sospecha de ETA (personas con síntomas de intoxicación alimentaria) es una emergencia sanitaria que requiere intervención médica y de autoridades. SEHSA no está diseñado para diagnosticar enfermedades en personas — ese es el dominio de la medicina y la epidemiología.",
@@ -152,6 +180,7 @@
       "id": "RI-05",
       "nombre": "Datos opcionales faltantes en el caso",
       "modulo": "incertidumbre",
+      "tipo_patron": "informativo",
       "condiciones": [
         {
           "objeto": "diagnostico",
@@ -173,6 +202,11 @@
         "Agregar advertencia de datos incompletos en la salida del sistema",
         "El diagnóstico puede ser menos preciso sin número de lote, cantidad e historial"
       ],
+      "acciones_operario": [
+        "Podés seguir con el diagnóstico, los datos que faltan son opcionales.",
+        "Si podés, pedile al encargado el número de lote y cuántos productos hay afectados."
+      ],
+      "revisar": true,
       "normativa": ["BPM"],
       "origen": "INCERTIDUMBRE",
       "explicacion": "Cuando faltan datos opcionales (número de lote, cantidad afectada, historial de incidentes previos), el diagnóstico continúa pero con menor precisión en las acciones correctivas. La trazabilidad completa requiere estos datos.",

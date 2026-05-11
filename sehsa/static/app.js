@@ -105,7 +105,8 @@ const ICONOS_MODULO = {
 async function cargarModulosYMostrar() {
   mostrarPantalla('pantalla-modulo');
   try {
-    const resp = await fetch('/modulos');
+    const perfil = estado.perfil || 'supervisor';
+    const resp = await fetch(`/modulos?perfil=${perfil}`);
     const modulos = await resp.json();
     estado.modulosData = modulos;
     renderizarModulos(modulos);
@@ -231,6 +232,26 @@ function crearGrupoPregunta(pregunta, idx, total) {
         ${options}
       </select>
     `;
+  } else if (pregunta.tipo === 'visual_card' && pregunta.opciones) {
+    const tarjetas = pregunta.opciones.map(o => `
+      <button
+        class="visual-card"
+        role="radio"
+        aria-label="${o.aria_label || o.etiqueta}"
+        data-id="${pregunta.id}"
+        data-val="${o.valor}"
+        onclick="responderVisualCard('${pregunta.id}', '${o.valor}', this)"
+      >
+        <span class="visual-card-swatch" style="background:${o.color};" aria-hidden="true"></span>
+        <span class="visual-card-etiqueta">${o.etiqueta}</span>
+        <span class="visual-card-desc">${o.descripcion || ''}</span>
+      </button>
+    `).join('');
+    inputHtml = `
+      <div class="visual-card-grupo" role="radiogroup" aria-label="${pregunta.texto}">
+        ${tarjetas}
+      </div>
+    `;
   }
 
   div.innerHTML = `
@@ -248,6 +269,19 @@ function crearGrupoPregunta(pregunta, idx, total) {
   }
 
   return div;
+}
+
+/** Guarda la respuesta de tarjeta visual. */
+function responderVisualCard(id, valor, boton) {
+  document.querySelectorAll(`.visual-card[data-id="${id}"]`).forEach(b => {
+    b.classList.remove('seleccionada');
+    b.setAttribute('aria-checked', 'false');
+  });
+  boton.classList.add('seleccionada');
+  boton.setAttribute('aria-checked', 'true');
+  setHecho(id, valor);
+  actualizarDependencias();
+  contarRespuestas();
 }
 
 /** Guarda la respuesta booleana y actualiza el estado visual del botón. */
@@ -599,14 +633,28 @@ document.getElementById('btn-volver-resultado').addEventListener('click', () => 
 // Pantalla 7 — Historial de casos
 // -----------------------------------------------------------------------
 
+// IDs de patrones descartados por el usuario en esta sesión
+const patronesAtendidos = new Set(
+  JSON.parse(sessionStorage.getItem('sehsa_patrones_atendidos') || '[]')
+);
+
 async function cargarHistorial() {
   const tbody = document.getElementById('tabla-historial-body');
   const vacio = document.getElementById('historial-vacio');
   tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#888;">Cargando...</td></tr>';
 
+  // Cargar historial y análisis de patrones en paralelo
   try {
-    const resp = await fetch('/historial');
-    const casos = await resp.json();
+    const [respCasos, respPatrones] = await Promise.all([
+      fetch('/historial'),
+      fetch('/analisis_historial')
+    ]);
+
+    const casos = await respCasos.json();
+    const analisis = await respPatrones.json();
+
+    // Renderizar panel de alertas de patrones
+    renderizarPanelPatrones(analisis.patrones || []);
 
     tbody.innerHTML = '';
     if (casos.length === 0) {
@@ -621,7 +669,7 @@ async function cargarHistorial() {
       const reglas = (caso.reglas_ids || []).join(', ') || '—';
       tr.innerHTML = `
         <td>${caso.id}</td>
-        <td>${caso.fecha_legible || caso.timestamp?.substring(0,16).replace('T',' ')}</td>
+        <td>${caso.fecha_legible || (caso.timestamp || '').substring(0,16).replace('T',' ')}</td>
         <td>${caso.modulo || '—'}</td>
         <td><span class="nivel-badge nivel-${caso.nivel_riesgo}">${caso.nivel_riesgo || '—'}</span></td>
         <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${caso.diagnostico || ''}">
@@ -634,6 +682,91 @@ async function cargarHistorial() {
 
   } catch (e) {
     tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:#C0392B;">Error al cargar el historial: ${e.message}</td></tr>`;
+  }
+}
+
+const COLORES_RIESGO_PATRON = {
+  'CRÍTICO': '#C0392B',
+  'ALTO':    '#E67E22',
+  'MEDIO':   '#F1C40F',
+  'BAJO':    '#27AE60',
+};
+
+const ICONOS_TIPO_PATRON = {
+  'estructural': '⚙️',
+  'proceso':     '👤',
+  'informativo': 'ℹ️',
+};
+
+function renderizarPanelPatrones(patrones) {
+  const panel = document.getElementById('panel-patrones');
+  if (!panel) return;
+
+  // Filtrar los ya marcados como atendidos en esta sesión
+  const activos = patrones.filter(p => !patronesAtendidos.has(p.regla_id));
+
+  if (activos.length === 0) {
+    panel.style.display = 'none';
+    return;
+  }
+
+  panel.style.display = 'block';
+  panel.innerHTML = `
+    <h3 style="margin:0 0 12px;color:#1A3A5C;font-size:1rem;">
+      Alertas de patrones recurrentes
+    </h3>
+  `;
+
+  activos.forEach(patron => {
+    const color = COLORES_RIESGO_PATRON[patron.nivel_riesgo_patron] || '#888';
+    const icono = ICONOS_TIPO_PATRON[patron.tipo_patron] || 'ℹ️';
+    const tarjeta = document.createElement('div');
+    tarjeta.className = 'patron-alerta';
+    tarjeta.style.borderLeftColor = color;
+    tarjeta.setAttribute('role', 'alert');
+    tarjeta.setAttribute('aria-label',
+      `Alerta de patrón ${patron.tipo_patron}: ${patron.regla_nombre}`);
+    tarjeta.innerHTML = `
+      <div class="patron-header">
+        <span class="patron-icono" aria-hidden="true">${icono}</span>
+        <span class="patron-nombre">${patron.regla_nombre}</span>
+        <span class="patron-badge" style="background:${color};"
+              aria-label="Nivel de riesgo ${patron.nivel_riesgo_patron}">
+          ${patron.nivel_riesgo_patron}
+        </span>
+        <button
+          class="patron-btn-atender"
+          aria-label="Marcar alerta de '${patron.regla_nombre}' como atendida"
+          onclick="marcarPatronAtendido('${patron.regla_id}', this.closest('.patron-alerta'))"
+        >Marcar como atendida</button>
+      </div>
+      <p class="patron-recomendacion">${patron.recomendacion_estructural}</p>
+      <p class="patron-meta">
+        <span aria-label="Tipo de patrón">${patron.tipo_patron}</span> ·
+        <span>${patron.frecuencia} incidentes en ${patron.ventana_dias} días</span>
+      </p>
+    `;
+    panel.appendChild(tarjeta);
+  });
+}
+
+function marcarPatronAtendido(reglaId, elementoTarjeta) {
+  patronesAtendidos.add(reglaId);
+  sessionStorage.setItem(
+    'sehsa_patrones_atendidos',
+    JSON.stringify([...patronesAtendidos])
+  );
+  if (elementoTarjeta) {
+    elementoTarjeta.style.transition = 'opacity .3s';
+    elementoTarjeta.style.opacity = '0';
+    setTimeout(() => {
+      elementoTarjeta.remove();
+      // Si no quedan alertas, ocultar el panel
+      const panel = document.getElementById('panel-patrones');
+      if (panel && panel.querySelectorAll('.patron-alerta').length === 0) {
+        panel.style.display = 'none';
+      }
+    }, 300);
   }
 }
 

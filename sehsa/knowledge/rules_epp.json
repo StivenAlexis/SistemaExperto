@@ -6,6 +6,7 @@
       "id": "R12",
       "nombre": "Trabajo con hipoclorito sin equipo de protección personal",
       "modulo": "epp",
+      "tipo_patron": "proceso",
       "condiciones": [
         {
           "objeto": "personal",
@@ -43,6 +44,13 @@
         "Capacitar al operario en el manejo seguro del hipoclorito y el uso obligatorio de EPP",
         "Registrar el incidente en el parte diario de seguridad"
       ],
+      "acciones_operario": [
+        "Pará la limpieza.",
+        "Ponete los guantes de goma, las antiparras y el delantal antes de seguir.",
+        "Si te salpicó el cloro en los ojos o la piel, lavate con agua abundante y avisale al encargado.",
+        "Nunca uses lavandina sin guantes y antiparras."
+      ],
+      "revisar": true,
       "normativa": ["Ley 19587 de Higiene y Seguridad en el Trabajo", "Decreto 351/79"],
       "origen": "EXTRAIDA",
       "explicacion": "El hipoclorito de sodio es un oxidante fuerte que puede causar irritación severa en piel, ojos y mucosas. La exposición sin protección adecuada es un riesgo laboral real y concreto, con daño potencial inmediato. El EPP adecuado (guantes, antiparras) es la barrera de protección mínima obligatoria.",
@@ -52,6 +60,7 @@
       "id": "R13",
       "nombre": "Levantamiento manual de cargas sin técnica correcta",
       "modulo": "epp",
+      "tipo_patron": "proceso",
       "condiciones": [
         {
           "objeto": "personal",
@@ -74,6 +83,13 @@
         "Evaluar la incorporación de ayuda mecánica (zorra, carretilla, apilador)",
         "Planificar capacitación ergonómica para todo el personal que manipula cargas"
       ],
+      "acciones_operario": [
+        "Para levantarlo bien: doblá las rodillas, mantené la espalda recta y pegá la caja al cuerpo.",
+        "Si la caja pesa mucho, pedile ayuda a un compañero.",
+        "Si hay una zorra o carretilla, usala.",
+        "Si te duele la espalda, avisale al encargado antes de seguir."
+      ],
+      "revisar": true,
       "normativa": ["Resolución 295/03 — Ergonomía", "Ley 19587 de Higiene y Seguridad en el Trabajo"],
       "origen": "EXTRAIDA",
       "explicacion": "El levantamiento incorrecto de cargas es la principal causa de lesiones musculoesqueléticas en el sector comercio alimentario. Las lesiones de columna lumbar son acumulativas y pueden ser permanentes, representando un alto costo humano y laboral.",
@@ -83,6 +99,7 @@
       "id": "R14",
       "nombre": "Piso húmedo sin señalización en área de circulación",
       "modulo": "epp",
+      "tipo_patron": "proceso",
       "condiciones": [
         {
           "objeto": "piso",
@@ -120,6 +137,13 @@
         "Verificar que el personal del área cuente con calzado antideslizante",
         "Evaluar si la causa del piso húmedo es un derrame que requiere investigación"
       ],
+      "acciones_operario": [
+        "Ponele el cartel de 'Piso Mojado' ahora, antes de que pase alguien.",
+        "Si podés, bloqueá el paso por ahí.",
+        "Secá el piso lo antes posible.",
+        "Si el piso está muy resbaladizo, cerrá el área hasta que esté seco."
+      ],
+      "revisar": true,
       "normativa": ["Ley 19587 de Higiene y Seguridad en el Trabajo", "Decreto 351/79"],
       "origen": "EXTRAIDA",
       "explicacion": "Las caídas en piso mojado son uno de los accidentes laborales más frecuentes en comercios alimentarios. Sin señalización, el trabajador o cliente no puede anticipar el riesgo. La señalización inmediata es la medida preventiva más simple y efectiva.",
@@ -129,6 +153,7 @@
       "id": "R15",
       "nombre": "Accidente laboral ocurrido en el establecimiento",
       "modulo": "epp",
+      "tipo_patron": "informativo",
       "condiciones": [
         {
           "objeto": "incidente",
@@ -153,6 +178,14 @@
         "Evaluar las causas raíz del accidente (técnicas, organizacionales, humanas)",
         "Implementar medidas correctivas y preventivas para evitar recurrencia"
       ],
+      "acciones_operario": [
+        "Atendé al compañero lastimado primero — eso es lo más urgente.",
+        "Si la lesión es grave, llamá a emergencias.",
+        "Avisale al encargado enseguida.",
+        "No muevas nada del lugar hasta que el encargado lo vea.",
+        "El encargado va a anotar lo que pasó en el libro de accidentes."
+      ],
+      "revisar": true,
       "normativa": ["Ley 19587 de Higiene y Seguridad en el Trabajo"],
       "origen": "EXTRAIDA",
       "explicacion": "Todo accidente laboral, independientemente de su gravedad aparente, debe ser registrado e investigado. La investigación de causas es el mecanismo principal de prevención de accidentes futuros. El registro es además una obligación legal.",

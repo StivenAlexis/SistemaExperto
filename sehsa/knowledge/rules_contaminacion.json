@@ -6,6 +6,7 @@
       "id": "R07",
       "nombre": "Contaminación cruzada de alimento cocido listo para consumo",
       "modulo": "contaminacion",
+      "tipo_patron": "proceso",
       "condiciones": [
         {
           "objeto": "personal",
@@ -43,6 +44,14 @@
         "Implementar control visual de higiene de manos antes de manipular alimentos listos",
         "Registrar el incidente y las acciones correctivas tomadas"
       ],
+      "acciones_operario": [
+        "Tirá la comida cocida que puede haber sido contaminada.",
+        "Lavá y desinfectá todos los cuchillos, tablas y utensilios que usaste.",
+        "Lavate bien las manos con jabón durante 20 segundos.",
+        "Avisale al encargado de lo que pasó.",
+        "Antes de seguir trabajando, lavate las manos de nuevo."
+      ],
+      "revisar": true,
       "normativa": ["CAA", "BPM"],
       "origen": "EXTRAIDA",
       "explicacion": "La contaminación cruzada entre alimento crudo y cocido listo para consumo es una de las principales causas de ETA. El alimento crudo contiene patógenos que la cocción destruyó; al contaminarse el cocido, esos patógenos se transfieren sin que haya un paso de cocción posterior que los elimine.",
@@ -52,6 +61,7 @@
       "id": "R08",
       "nombre": "Deterioro organoléptico del alimento (olor, color o textura anormal)",
       "modulo": "contaminacion",
+      "tipo_patron": "proceso",
       "condiciones": [
         {
           "objeto": "alimento",
@@ -75,6 +85,14 @@
         "Investigar la causa del deterioro (cadena de frío, vencimiento, contaminación)",
         "Revisar lotes del mismo proveedor y fecha que puedan estar igualmente afectados"
       ],
+      "acciones_operario": [
+        "Sacá ese alimento del mostrador o la heladera ya.",
+        "No lo vendas ni lo uses para nada — tiralo.",
+        "Anotá qué alimento era, cuánto había y por qué lo retiraste (olor, color, textura).",
+        "Avisale al encargado.",
+        "Revisá si hay más productos del mismo lote o proveedor."
+      ],
+      "revisar": true,
       "normativa": ["CAA"],
       "origen": "EXTRAIDA",
       "explicacion": "Los signos organolépticos alterados (olor a podrido, color verdoso/negruzco, textura viscosa o desintegrada) son indicadores directos de deterioro microbiano o químico avanzado. Un alimento con estas características representa un riesgo inaceptable para el consumidor, independientemente de la fecha de vencimiento o la temperatura.",
@@ -84,6 +102,7 @@
       "id": "R09",
       "nombre": "Manipulación de alimento listo sin lavado de manos previo",
       "modulo": "contaminacion",
+      "tipo_patron": "proceso",
       "condiciones": [
         {
           "objeto": "personal",
@@ -113,6 +132,13 @@
         "Supervisar la correcta ejecución del lavado antes de permitir retomar la tarea",
         "Verificar disponibilidad de jabón, agua caliente y toallas descartables en el área"
       ],
+      "acciones_operario": [
+        "Pará lo que estás haciendo.",
+        "Lavate las manos con jabón y agua caliente durante 20 segundos.",
+        "Secate con papel descartable.",
+        "Recién ahí podés tocar la comida lista para servir."
+      ],
+      "revisar": true,
       "normativa": ["BPM"],
       "origen": "EXTRAIDA",
       "explicacion": "Las manos del personal son el principal vehículo de contaminación microbiológica en la manipulación de alimentos. El lavado de manos es la medida de higiene más efectiva y de menor costo disponible en cualquier establecimiento.",
@@ -122,6 +148,7 @@
       "id": "R10",
       "nombre": "Uso compartido de utensilios sin limpieza y desinfección entre usos",
       "modulo": "contaminacion",
+      "tipo_patron": "proceso",
       "condiciones": [
         {
           "objeto": "utensilio",
@@ -145,6 +172,13 @@
         "Capacitar a todo el personal en la separación de utensilios",
         "Verificar que los racks y cajones de utensilios también estén separados físicamente"
       ],
+      "acciones_operario": [
+        "Dejá de usar ese cuchillo o tabla para la comida cocida.",
+        "Lavá y desinfectá todos los utensilios que tocaron tanto crudo como cocido.",
+        "Usá utensilios diferentes para carne cruda y comida ya cocinada.",
+        "Acordate: el rojo es para crudo, el verde para cocido."
+      ],
+      "revisar": true,
       "normativa": ["BPM"],
       "origen": "EXTRAIDA",
       "explicacion": "Los utensilios compartidos entre alimentos crudos y cocidos son un vehículo directo de contaminación cruzada. Una tabla de corte que tocó carne cruda con Salmonella y luego se usa para el pollo cocido transfiere los patógenos al alimento final.",
@@ -154,6 +188,7 @@
       "id": "R11",
       "nombre": "Cuerpo extraño detectado en alimento en venta",
       "modulo": "contaminacion",
+      "tipo_patron": "informativo",
       "condiciones": [
         {
           "objeto": "alimento",
@@ -185,6 +220,13 @@
         "Notificar al jefe inmediato y al área de calidad",
         "Si el cuerpo extraño es vidrio o metal, evaluar riesgo para consumidores previos"
       ],
+      "acciones_operario": [
+        "Sacá ese alimento de la venta ahora mismo.",
+        "No lo toques más — avisale al encargado directamente.",
+        "Guardá el objeto extraño para que el encargado lo vea.",
+        "Revisá si hay otros productos del mismo lote con el mismo problema."
+      ],
+      "revisar": true,
       "normativa": ["CAA"],
       "origen": "EXTRAIDA",
       "explicacion": "La presencia de cuerpos extraños (materias extrañas) en alimentos representa un riesgo físico directo para el consumidor: lesiones en boca, garganta, tubo digestivo. El nivel CRÍTICO refleja que el daño puede ser inmediato si el producto llega al consumidor.",

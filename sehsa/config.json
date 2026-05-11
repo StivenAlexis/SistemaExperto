@@ -1,0 +1,6 @@
+{
+  "pattern_detector": {
+    "n_umbral": 3,
+    "ventana_dias": 30
+  }
+}

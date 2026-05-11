@@ -413,6 +413,143 @@ input[type="number"]:focus, select:focus {
   margin-top: 20px;
 }
 
+/* ---- Visual Cards (tipo: visual_card) ---- */
+.visual-card-grupo {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.visual-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  background: var(--color-blanco);
+  border: 2px solid var(--color-borde);
+  border-radius: var(--radio);
+  padding: 14px 12px;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color var(--transicion), box-shadow var(--transicion);
+  width: 100%;
+}
+
+.visual-card:hover,
+.visual-card:focus-visible {
+  border-color: var(--color-primario);
+  box-shadow: 0 0 0 3px rgba(26,58,92,.15);
+  outline: none;
+}
+
+.visual-card.seleccionada {
+  border-color: var(--color-primario);
+  background: #EBF2FA;
+  box-shadow: 0 0 0 3px rgba(26,58,92,.20);
+}
+
+.visual-card-swatch {
+  display: block;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px solid rgba(0,0,0,.12);
+  flex-shrink: 0;
+}
+
+.visual-card-etiqueta {
+  font-weight: 700;
+  font-size: .95rem;
+  color: var(--color-texto);
+}
+
+.visual-card-desc {
+  font-size: .82rem;
+  color: var(--color-texto-suave);
+  line-height: 1.35;
+}
+
+/* ---- Panel de patrones recurrentes (historial) ---- */
+#panel-patrones {
+  background: #F8F9FA;
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio);
+  padding: 16px 18px;
+  margin-bottom: 20px;
+}
+
+.patron-alerta {
+  background: var(--color-blanco);
+  border-left: 5px solid #888;
+  border-radius: 0 var(--radio) var(--radio) 0;
+  padding: 12px 14px;
+  margin-bottom: 10px;
+  box-shadow: var(--sombra);
+}
+
+.patron-alerta:last-child { margin-bottom: 0; }
+
+.patron-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 6px;
+}
+
+.patron-icono {
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.patron-nombre {
+  font-weight: 700;
+  font-size: .92rem;
+  color: var(--color-texto);
+  flex: 1;
+  min-width: 120px;
+}
+
+.patron-badge {
+  color: white;
+  font-size: .72rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 10px;
+  white-space: nowrap;
+}
+
+.patron-btn-atender {
+  background: none;
+  border: 1px solid var(--color-borde);
+  border-radius: 4px;
+  padding: 3px 10px;
+  font-size: .78rem;
+  color: var(--color-texto-suave);
+  cursor: pointer;
+  transition: background var(--transicion), color var(--transicion);
+  white-space: nowrap;
+}
+
+.patron-btn-atender:hover {
+  background: #E8F4FD;
+  color: var(--color-primario);
+  border-color: var(--color-primario);
+}
+
+.patron-recomendacion {
+  font-size: .87rem;
+  color: var(--color-texto);
+  line-height: 1.45;
+  margin-bottom: 6px;
+}
+
+.patron-meta {
+  font-size: .78rem;
+  color: var(--color-texto-suave);
+}
+
 /* ---- Responsive ---- */
 @media(max-width: 480px) {
   .contenedor { padding: 16px 12px 50px; }
