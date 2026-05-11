@@ -6,7 +6,7 @@ Sistema experto basado en encadenamiento hacia adelante para diagnóstico de rie
 
 ## Descripción
 
-SEHSA evalúa condiciones de higiene y seguridad alimentaria ingresadas por el usuario y genera un diagnóstico con nivel de riesgo, acciones correctivas y normativa aplicable. Utiliza una base de conocimiento de ~30 reglas de producción organizadas en 6 módulos temáticos, con motor de inferencia por encadenamiento hacia adelante.
+SEHSA evalúa condiciones de higiene y seguridad alimentaria ingresadas por el usuario y genera un diagnóstico con nivel de riesgo, acciones correctivas y normativa aplicable. Utiliza una base de conocimiento de 26 reglas de producción organizadas en 6 módulos temáticos, con motor de inferencia por encadenamiento hacia adelante.
 
 **Dominio:** Seguridad alimentaria e higiene ocupacional en establecimientos de venta y elaboración de alimentos.  
 **Experta de dominio:** Ing. Carolina G. Marturet (Encargada de Rotisería, Supermercado Parada Canga).  
@@ -42,6 +42,68 @@ SEHSA evalúa condiciones de higiene y seguridad alimentaria ingresadas por el u
 | EPP | R12 a R15 | Equipos de protección, ergonomía, accidentes |
 | Plagas | R16 a R18 | Indicios, integridad de envases |
 | Documentación | R19 a R21 | Registros, rotulación, trazabilidad |
+
+---
+
+## Reglas del experto
+
+Las reglas están definidas en archivos JSON dentro de `sehsa/knowledge/`. Cada regla combina condiciones sobre hechos de la memoria de trabajo, una conclusión diagnóstica, un nivel de riesgo, prioridad, acciones recomendadas y normativa asociada.
+
+### Incertidumbre
+
+| ID | Regla | Condiciones principales | Riesgo |
+|----|-------|-------------------------|--------|
+| RI-01 | Tiempo de exposición desconocido en alimento perecedero | Tiempo de exposición desconocido y alimento perecedero | CRÍTICO |
+| RI-02 | Temperatura no medida con estado organoléptico alterado | No se midió temperatura y el alimento presenta olor, color o textura anormal | CRÍTICO |
+| RI-03 | Temperatura no medida con estado organoléptico normal | No se midió temperatura y el alimento parece normal | MEDIO |
+| RI-04 | Sospecha de Enfermedad Transmitida por Alimentos (ETA) | Existe sospecha de personas enfermas por consumo de alimentos | CRÍTICO |
+| RI-05 | Datos opcionales faltantes en el caso | Faltan datos opcionales como lote, cantidad o historial | BAJO |
+
+### Cadena de frío
+
+| ID | Regla | Condiciones principales | Riesgo |
+|----|-------|-------------------------|--------|
+| R01 | Rotura de cadena de frío en alimento perecedero | Temperatura mayor a 5°C, alimento perecedero y exposición prolongada o desconocida | CRÍTICO |
+| R02 | Temperatura insuficiente en exhibidora caliente | Exhibidora caliente por debajo de 60°C con alimento cocido listo para consumo | ALTO |
+| R03 | Heladera sin funcionar por tiempo desconocido | Heladera apagada o fallando y tiempo de falla desconocido | CRÍTICO |
+| R04 | Temperatura de cocción insuficiente | Cocción menor a 60°C en alimento de origen animal | ALTO |
+| R05 | Reutilización segura de alimento cocido no vendido | Alimento cocido no vendido, conservación correcta y consumo el mismo día | BAJO |
+| R06 | Rechazo de lote por cadena de frío comprometida | Temperatura fuera de rango en recepción y proveedor sin justificación | CRÍTICO |
+
+### Contaminación
+
+| ID | Regla | Condiciones principales | Riesgo |
+|----|-------|-------------------------|--------|
+| R07 | Contaminación cruzada de alimento cocido listo | Contacto crudo-cocido, sin lavado de manos y alimento listo para consumo | CRÍTICO |
+| R08 | Deterioro organoléptico del alimento | Olor anormal, color alterado o textura anormal | CRÍTICO |
+| R09 | Manipulación de alimento listo sin lavado de manos | El operario no se lavó las manos antes de manipular alimento listo | ALTO |
+| R10 | Uso compartido de utensilios sin limpieza | Utensilios usados para crudo y cocido sin lavado y desinfección | ALTO |
+| R11 | Cuerpo extraño detectado en alimento en venta | Cuerpo extraño presente en alimento disponible para venta | CRÍTICO |
+
+### EPP y seguridad laboral
+
+| ID | Regla | Condiciones principales | Riesgo |
+|----|-------|-------------------------|--------|
+| R12 | Trabajo con hipoclorito sin EPP | Limpieza con hipoclorito sin guantes, antiparras o protección correspondiente | ALTO |
+| R13 | Levantamiento manual de cargas sin técnica | Manipulación manual de cargas sin técnica ergonómica | MEDIO |
+| R14 | Piso húmedo sin señalización | Piso húmedo en área de circulación sin cartel o barrera preventiva | ALTO |
+| R15 | Accidente laboral ocurrido | Se registró un accidente laboral en el establecimiento | ALTO |
+
+### Plagas
+
+| ID | Regla | Condiciones principales | Riesgo |
+|----|-------|-------------------------|--------|
+| R16 | Indicios de plagas con envases herméticos intactos | Indicios de plaga, envases herméticos y sin excrementos sobre productos | ALTO |
+| R17 | Indicios de plagas con envases comprometidos | Indicios de plaga y envases dañados, perforados o no herméticos | CRÍTICO |
+| R18 | Control de plagas vencido con indicios activos | Más de 30 días desde el último control e indicios activos de plaga | ALTO |
+
+### Documentación
+
+| ID | Regla | Condiciones principales | Riesgo |
+|----|-------|-------------------------|--------|
+| R19 | Ausencia de registros de temperatura | No hay registros periódicos y existen perecederos almacenados | ALTO |
+| R20 | Rotulación incorrecta o ausente | Producto en exhibición con etiqueta ausente, ilegible o incompleta | MEDIO |
+| R21 | Sospecha de ETA fuera de alcance | Personas con síntomas atribuibles al consumo de alimentos | CRÍTICO |
 
 ---
 
@@ -139,6 +201,42 @@ La variable de entorno `PORT` es leída automáticamente por la aplicación.
 5. Ver el **diagnóstico** con nivel de riesgo y acciones recomendadas.
 6. Consultar la **explicación detallada** con reglas activadas y normativa.
 7. Guardar el caso en el **historial** si se desea.
+
+### Ejemplo de uso
+
+Caso: al iniciar el turno se detecta una heladera apagada con carne cruda. La temperatura medida es de 14°C y no se sabe cuánto tiempo estuvo sin funcionar.
+
+Hechos ingresados:
+
+```json
+{
+  "alimento": {
+    "tipo": "carne_cruda",
+    "es_perecedero": true,
+    "vencimiento_vigente": true
+  },
+  "temperatura": {
+    "valor_celsius": 14,
+    "medida": true
+  },
+  "equipo": {
+    "tipo": "heladera",
+    "funcionando": false
+  },
+  "exposicion": {
+    "tiempo_conocido": false
+  }
+}
+```
+
+Resultado esperado:
+
+- **Nivel de riesgo:** CRÍTICO.
+- **Reglas activadas:** RI-01, R03 y R01.
+- **Diagnóstico:** rotura de cadena de frío y heladera sin funcionar por tiempo desconocido.
+- **Acciones principales:** retirar y descartar los alimentos perecederos afectados, registrar el incidente, avisar al responsable y no volver a usar el equipo hasta su reparación.
+
+Este ejemplo muestra el encadenamiento hacia adelante: RI-01 aplica el principio de precaución ante tiempo desconocido y deriva `exposicion.riesgo_prolongado = true`; ese nuevo hecho permite activar R01 junto con la temperatura mayor a 5°C y el carácter perecedero del alimento. En paralelo, R03 se activa porque la heladera no funciona y no se conoce el tiempo de falla.
 
 ---
 
