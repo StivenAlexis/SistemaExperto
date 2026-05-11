@@ -7,9 +7,11 @@
 3. [Memoria de trabajo](#3-memoria-de-trabajo)
 4. [Base de conocimiento](#4-base-de-conocimiento)
 5. [Sistema de explicación](#5-sistema-de-explicación)
-6. [Interfaz web](#6-interfaz-web)
-7. [Flujo completo de ejecución](#7-flujo-completo-de-ejecución)
-8. [Manejo de incertidumbre](#8-manejo-de-incertidumbre)
+6. [Detector de patrones recurrentes](#6-detector-de-patrones-recurrentes)
+7. [Interfaz web](#7-interfaz-web)
+8. [Flujo completo de ejecución](#8-flujo-completo-de-ejecución)
+9. [Manejo de incertidumbre](#9-manejo-de-incertidumbre)
+10. [Pruebas](#10-pruebas)
 
 ---
 
@@ -25,20 +27,20 @@ SEHSA sigue la arquitectura clásica de un sistema experto con tres capas:
                    │ HTTP / JSON (fetch)
 ┌──────────────────▼──────────────────────┐
 │   SERVIDOR REST (app.py)                │
-│   Flask · endpoints /consulta /modulos  │
-└──────────────────┬──────────────────────┘
-                   │ Python
-┌──────────────────▼──────────────────────┐
-│   MOTOR DE INFERENCIA (engine.py)       │
-│   ┌─────────────────┐ ┌──────────────┐  │
-│   │ working_memory  │ │explanation   │  │
-│   │ .py (hechos OAV)│ │.py (reportes)│  │
-│   └─────────────────┘ └──────────────┘  │
-└──────────────────┬──────────────────────┘
-                   │ JSON
-┌──────────────────▼──────────────────────┐
+│   Flask · /consulta /modulos            │
+│   /historial /analisis_historial        │
+└───────┬──────────────────────┬──────────┘
+        │ Python                │ Python
+┌───────▼──────────┐   ┌───────▼──────────┐
+│ MOTOR (engine.py)│   │ DETECTOR PATRONES│
+│ working_memory   │   │ pattern_detector  │
+│ explanation.py   │   │ .py + config.json │
+└───────┬──────────┘   └───────┬──────────┘
+        │ JSON                  │ JSON
+┌───────▼──────────────────────▼──────────┐
 │   BASE DE CONOCIMIENTO (knowledge/)     │
-│   6 archivos JSON · ~30 reglas          │
+│   6 archivos JSON · 30 reglas           │
+│   + tipo_patron + acciones_operario     │
 └─────────────────────────────────────────┘
 ```
 
@@ -146,6 +148,7 @@ Todas las reglas están almacenadas en archivos JSON. El motor las carga dinámi
   "id": "R01",
   "nombre": "Rotura de cadena de frío en alimento perecedero",
   "modulo": "cadena_frio",
+  "tipo_patron": "proceso",
   "condiciones": [
     {"objeto": "temperatura", "atributo": "valor_celsius", "operador": ">", "valor": 5},
     {"objeto": "alimento", "atributo": "es_perecedero", "operador": "=", "valor": true},
@@ -161,11 +164,25 @@ Todas las reglas están almacenadas en archivos JSON. El motor las carga dinámi
     "Registrar el incidente con fecha, hora y temperatura medida",
     "Reparar o reemplazar el equipo de refrigeración"
   ],
+  "acciones_operario": [
+    "Sacá toda la mercadería de esa heladera ahora.",
+    "Tirá todo lo que estaba adentro — no sabés cuánto tiempo estuvo mal.",
+    "Avisale urgente al encargado."
+  ],
   "normativa": ["CAA Art. 154", "BPM Sección 5.3"],
   "explicacion": "Se detectó rotura de cadena de frío ...",
-  "comentario": "Zona de peligro: 5°C–60°C. Límite de 2 horas de exposición."
+  "comentario": "Zona de peligro: 5°C–60°C. Límite de 2 horas de exposición.",
+  "revisar": true
 }
 ```
+
+**Campos destacados:**
+
+| Campo | Descripción |
+|-------|-------------|
+| `tipo_patron` | Clasificación para el detector: `"estructural"` (falla de equipo), `"proceso"` (error humano), `"informativo"` (evento puntual, no genera recomendación estructural) |
+| `acciones_operario` | Versión en voseo argentino, lenguaje observable, sin terminología técnica. El motor usa este campo cuando el perfil es `"operario"`. |
+| `revisar` | Flag para marcar contenido que requiere validación del experto de dominio. El motor lo ignora. |
 
 ### Reglas por módulo
 
@@ -181,49 +198,49 @@ Todas las reglas están almacenadas en archivos JSON. El motor las carga dinámi
 
 **Cadena de frío (R01 a R06):**
 
-| Regla | Nombre | Riesgo |
-|-------|--------|--------|
-| R01 | Rotura de cadena de frío | CRÍTICO |
-| R02 | Temperatura de cocción insuficiente | ALTO |
-| R03 | Equipo de refrigeración sin funcionar | CRÍTICO |
-| R04 | Recepción de mercadería en temperatura inadecuada | ALTO |
-| R05 | Temperatura en zona de peligro sin medición | MEDIO |
-| R06 | Tiempo excedido en zona de peligro | CRÍTICO |
+| Regla | Nombre | Riesgo | Tipo |
+|-------|--------|--------|------|
+| R01 | Rotura de cadena de frío | CRÍTICO | proceso |
+| R02 | Temperatura de cocción insuficiente | ALTO | proceso |
+| R03 | Equipo de refrigeración sin funcionar | CRÍTICO | estructural |
+| R04 | Recepción de mercadería en temperatura inadecuada | ALTO | proceso |
+| R05 | Temperatura en zona de peligro sin medición | MEDIO | proceso |
+| R06 | Tiempo excedido en zona de peligro | CRÍTICO | proceso |
 
 **Contaminación (R07 a R11):**
 
-| Regla | Nombre | Riesgo |
-|-------|--------|--------|
-| R07 | Contaminación cruzada crudo-cocido | CRÍTICO |
-| R08 | Deterioro organoléptico | ALTO |
-| R09 | Higiene de manos deficiente | ALTO |
-| R10 | Utensilios compartidos sin higienizar | MEDIO |
-| R11 | Cuerpo extraño en alimento | CRÍTICO |
+| Regla | Nombre | Riesgo | Tipo |
+|-------|--------|--------|------|
+| R07 | Contaminación cruzada crudo-cocido | CRÍTICO | proceso |
+| R08 | Deterioro organoléptico | ALTO | proceso |
+| R09 | Higiene de manos deficiente | ALTO | proceso |
+| R10 | Utensilios compartidos sin higienizar | MEDIO | proceso |
+| R11 | Cuerpo extraño en alimento | CRÍTICO | informativo |
 
 **EPP — Equipo de Protección Personal (R12 a R15):**
 
-| Regla | Nombre | Riesgo |
-|-------|--------|--------|
-| R12 | Sin EPP manipulando químicos | CRÍTICO |
-| R13 | Ergonomía deficiente en tareas repetitivas | MEDIO |
-| R14 | Área de alto riesgo sin señalización | ALTO |
-| R15 | Accidente laboral sin registro | ALTO |
+| Regla | Nombre | Riesgo | Tipo |
+|-------|--------|--------|------|
+| R12 | Sin EPP manipulando químicos | CRÍTICO | proceso |
+| R13 | Ergonomía deficiente en tareas repetitivas | MEDIO | proceso |
+| R14 | Área de alto riesgo sin señalización | ALTO | proceso |
+| R15 | Accidente laboral sin registro | ALTO | informativo |
 
 **Plagas (R16 a R18):**
 
-| Regla | Nombre | Riesgo |
-|-------|--------|--------|
-| R16 | Indicios de roedores o insectos | CRÍTICO |
-| R17 | Envase comprometido con producto expuesto | ALTO |
-| R18 | Control de plagas sin frecuencia establecida | MEDIO |
+| Regla | Nombre | Riesgo | Tipo |
+|-------|--------|--------|------|
+| R16 | Indicios de plagas con envases herméticos intactos | ALTO | estructural |
+| R17 | Indicios de plagas con envases comprometidos (dañados) | CRÍTICO | estructural |
+| R18 | Control de plagas vencido (+30 días) con indicios activos | ALTO | proceso |
 
 **Documentación (R19 a R21):**
 
-| Regla | Nombre | Riesgo |
-|-------|--------|--------|
-| R19 | Sin registro de temperaturas | MEDIO |
-| R20 | Rotulación incorrecta o faltante | ALTO |
-| R21 | Sin trazabilidad del lote | MEDIO |
+| Regla | Nombre | Riesgo | Tipo |
+|-------|--------|--------|------|
+| R19 | Ausencia de registros de temperatura con perecederos almacenados | ALTO | proceso |
+| R20 | Rotulación incorrecta o ausente en producto en exhibición | MEDIO | proceso |
+| R21 | Sospecha de ETA — fuera de alcance del sistema | CRÍTICO | informativo |
 
 ---
 
@@ -231,31 +248,51 @@ Todas las reglas están almacenadas en archivos JSON. El motor las carga dinámi
 
 **Archivo:** `sehsa/explanation.py`
 
-El sistema genera reportes adaptados al perfil del usuario:
+El sistema genera reportes completamente adaptados al perfil del usuario. El mismo diagnóstico produce salidas radicalmente diferentes según quién lo consulta.
 
-| Perfil | Detalle | Contenido |
-|--------|---------|-----------|
-| **operario** | Mínimo | Solo acciones concretas a tomar |
-| **supervisor** | Básico | Acciones + razón principal |
-| **profesional** | Completo | Traza técnica + normativa + condiciones evaluadas |
-| **gerente** | Ejecutivo | Resumen de riesgo + impacto de negocio |
+### Diferencias por perfil
+
+| Perfil | Diagnóstico | Justificación | Acciones |
+|--------|-------------|---------------|----------|
+| **operario** | Observable: "Hay N problemas..." | Enumeración de lo observado, sin siglas | `acciones_operario` del JSON (voseo, imperativo) |
+| **supervisor** | Técnico básico | Reglas activadas + módulos | `acciones` del JSON |
+| **profesional** | HACCP completo | Traza con IDs de regla, normativa, condiciones exactas | `acciones` con normativa |
+| **gerente** | Ejecutivo | Solo nivel de riesgo y reglas de máxima prioridad | `acciones` + resumen ejecutivo |
+
+### Descripción de riesgo por perfil (operario)
+
+Para operario, los niveles usan lenguaje imperativo directo:
+
+| Nivel | Texto operario |
+|-------|----------------|
+| CRÍTICO | `PELIGRO ALTO — Actuá ahora mismo. No esperes.` |
+| ALTO | `Problema serio — Avisale al encargado y actuá pronto.` |
+| MEDIO | `Hay cosas para corregir — Avisale al encargado.` |
+| BAJO | `Está bien por ahora — Pero prestale atención.` |
+
+### Selección de acciones
+
+Cuando el perfil es `"operario"`:
+1. El sistema busca el campo `acciones_operario` en la regla.
+2. Si existe, lo usa (lenguaje observable, voseo argentino).
+3. Si no existe, cae al campo `acciones` estándar como respaldo.
 
 ### Estructura del reporte
 
 ```python
 {
-  "perfil": "supervisor",
+  "perfil": "operario",
   "nivel_riesgo": "CRÍTICO",
-  "descripcion_riesgo": "Riesgo CRÍTICO — Acción inmediata obligatoria.",
-  "diagnostico": "Narrativa del diagnóstico en español",
-  "hechos_ingresados": [...],       # Hechos del usuario formateados
-  "reglas_activadas": [...],        # Con condiciones cumplidas y valores reales
-  "todas_las_acciones": [...],      # Acciones correctivas consolidadas
-  "normativa_aplicada": [...],      # Normativa aplicada
-  "advertencias": [...],            # Advertencias de incertidumbre
-  "datos_faltantes": [...],         # Datos opcionales no provistos
-  "justificacion": [...],           # Razonamiento
-  "resumen_ejecutivo": [...]        # Solo si perfil == 'gerente'
+  "descripcion_riesgo": "PELIGRO ALTO — Actuá ahora mismo. No esperes.",
+  "diagnostico": "Encontré 2 problemas. Hay un equipo de frío que no funciona y ...",
+  "hechos_ingresados": [...],
+  "reglas_activadas": [...],
+  "todas_las_acciones": [...],   # acciones_operario si existen
+  "normativa_aplicada": [...],
+  "advertencias": [...],
+  "datos_faltantes": [...],
+  "justificacion": [...],
+  "resumen_ejecutivo": [...]     # Solo si perfil == 'gerente'
 }
 ```
 
@@ -266,7 +303,79 @@ El sistema genera reportes adaptados al perfil del usuario:
 
 ---
 
-## 6. Interfaz web
+## 6. Detector de patrones recurrentes
+
+**Archivo:** `sehsa/pattern_detector.py`  
+**Configuración:** `sehsa/config.json`
+
+### Propósito
+
+Mientras el motor de inferencia diagnostica un caso individual, el detector analiza el **historial completo** buscando causas raíz que se repiten. Si una regla se dispara N veces en los últimos X días, el sistema sugiere una medida correctiva **estructural** (no puntual).
+
+### Configuración (`config.json`)
+
+```json
+{
+  "pattern_detector": {
+    "n_umbral": 3,
+    "ventana_dias": 30
+  }
+}
+```
+
+| Parámetro | Descripción |
+|-----------|-------------|
+| `n_umbral` | Cantidad mínima de repeticiones para considerar un patrón |
+| `ventana_dias` | Días hacia atrás que se analizan (ventana deslizante desde hoy) |
+
+Ambos parámetros pueden sobreescribirse por consulta vía query params: `GET /analisis_historial?n=2&dias=60`.
+
+### Algoritmo
+
+```
+1. Filtrar casos del historial dentro de la ventana de días
+2. Para cada caso, extraer las reglas activadas (lista de IDs)
+3. Contar frecuencia de cada rule_id en toda la ventana
+4. Seleccionar reglas con frecuencia >= n_umbral
+5. Excluir reglas con tipo_patron == "informativo"
+6. Ordenar: nivel_riesgo desc > frecuencia desc > ultima_ocurrencia desc
+7. Generar recomendación según tipo_patron de cada regla
+```
+
+### Clasificación `tipo_patron`
+
+| Valor | Significado | Recomendación generada |
+|-------|-------------|------------------------|
+| `"estructural"` | Falla repetida de equipo o instalación | Reparación o reemplazo del equipo; revisión de mantenimiento preventivo |
+| `"proceso"` | Error humano recurrente | Capacitación del personal; revisión del procedimiento (POES/BPM) |
+| `"informativo"` | Evento puntual (ETA, accidente) | **No genera recomendación** — son eventos no recurribles por diseño |
+
+### Respuesta del endpoint `/analisis_historial`
+
+```json
+{
+  "patrones": [
+    {
+      "regla_id": "R03",
+      "regla_nombre": "Equipo de refrigeración sin funcionar",
+      "modulo": "cadena_frio",
+      "tipo_patron": "estructural",
+      "icono": "gear",
+      "frecuencia": 4,
+      "ventana_dias": 30,
+      "nivel_riesgo_patron": "CRÍTICO",
+      "ultima_ocurrencia": "2026-05-08",
+      "recomendacion_estructural": "Este equipo falló 4 veces en 30 días. Evaluá reparación definitiva o reemplazo."
+    }
+  ],
+  "total_casos_analizados": 12,
+  "ventana_dias": 30,
+  "n_umbral": 3
+}
+
+---
+
+## 7. Interfaz web
 
 **Archivos:** `sehsa/static/`
 
@@ -280,14 +389,30 @@ La interfaz es una SPA (Single Page Application) de 7 pantallas implementada en 
                                                                               [7. Historial]
 ```
 
+### Pantalla 2 — Selección de perfil
+
+El perfil seleccionado se almacena en la variable global `perfil` y se envía en todas las consultas posteriores. Controla el lenguaje del formulario y del reporte.
+
 ### Pantalla 4 — Formulario dinámico
 
-El formulario se genera dinámicamente según el módulo seleccionado. Las preguntas se cargan desde el endpoint `GET /modulos` y soportan:
+El formulario se genera dinámicamente con `GET /modulos?perfil=<perfil>`. Los tipos de pregunta soportados:
 
-- **bool** → Checkbox Sí/No
-- **select** → Lista desplegable con opciones predefinidas
-- **number** → Entrada numérica (temperatura, horas, concentración)
-- **Dependencias** → Una pregunta puede depender de la respuesta a otra (ej: mostrar "valor en °C" solo si "¿Se midió temperatura?" = Sí)
+| Tipo | Descripción | Componente |
+|------|-------------|------------|
+| `bool` | Sí / No | Dos botones toggle |
+| `select` | Opción de lista | Dropdown `<select>` |
+| `number` | Valor numérico | Input con unidad |
+| `visual_card` | Selección visual | Grid de tarjetas con swatch de color |
+
+**Preguntas adaptadas al perfil:** cuando el perfil es `"operario"`, el servidor reemplaza el campo `texto` de cada pregunta con `texto_operario` (lenguaje observable, sin siglas). El frontend recibe el texto ya adaptado y no necesita lógica de perfil.
+
+**Tarjetas visuales (`visual_card`):** usadas para el estado organoléptico del alimento. Cada opción muestra:
+- Swatch circular de color (siempre visible)
+- Etiqueta del estado (ej: "Bueno", "Deteriorado")
+- Descripción observable siempre visible debajo (no tooltip)
+- `role="radio"` y `aria-label` para accesibilidad
+
+**Dependencias:** una pregunta puede depender de la respuesta a otra. El frontend evalúa las dependencias en tiempo real y muestra/oculta preguntas según corresponda.
 
 ### Pantalla 5 — Resultado
 
@@ -302,13 +427,29 @@ Muestra:
 Muestra:
 - Todos los hechos ingresados (formateados en lenguaje natural)
 - Reglas disparadas con sus condiciones y valores
-- Acciones correctivas completas
+- Acciones correctivas completas (en lenguaje de perfil)
 - Normativa aplicada
 - Datos que faltaron (opcionales)
 
+### Pantalla 7 — Historial
+
+El historial carga en paralelo los casos guardados y el análisis de patrones:
+
+```javascript
+Promise.all([fetch('/historial'), fetch('/analisis_historial')])
+```
+
+**Panel de patrones (`#panel-patrones`):** si el detector encuentra patrones recurrentes, se muestra un panel con tarjetas de alerta antes de la tabla de casos. Cada tarjeta incluye:
+- Icono según tipo: engranaje (estructural), persona (proceso)
+- Nombre de la regla y badge con nivel de riesgo
+- Recomendación estructural
+- Botón "Marcar como atendida" — oculta la tarjeta con transición CSS sin eliminarla del servidor
+
+El estado "atendida" se persiste en `sessionStorage` (clave `sehsa_patrones_atendidos`) y se restablece al cerrar el navegador.
+
 ---
 
-## 7. Flujo completo de ejecución
+## 8. Flujo completo de ejecución
 
 **Ejemplo práctico: Heladera sin funcionar con carne cruda**
 
@@ -380,7 +521,7 @@ Hechos evaluados:
 
 ---
 
-## 8. Manejo de incertidumbre
+## 9. Manejo de incertidumbre
 
 SEHSA implementa un módulo específico para situaciones donde los datos son incompletos o contradictorios. Las reglas RI-01 a RI-05 se evalúan **antes** del ciclo principal y pueden:
 
@@ -400,9 +541,11 @@ Ante datos faltantes que impliquen riesgo para la salud, el sistema siempre adop
 
 ---
 
-## Pruebas
+## 10. Pruebas
 
 **Archivos:** `sehsa/tests/`
+
+### Motor de inferencia (`test_engine.py`)
 
 | Caso | Descripción | Resultado esperado |
 |------|-------------|-------------------|
@@ -415,4 +558,20 @@ Ante datos faltantes que impliquen riesgo para la salud, el sistema siempre adop
 
 ```bash
 python tests/test_engine.py
+```
+
+### Detector de patrones (`test_pattern_detector.py`)
+
+| Caso | Descripción | Resultado esperado |
+|------|-------------|-------------------|
+| TC-P01 | Historial vacío | Sin patrones |
+| TC-P02 | Misma regla 3 veces dentro de la ventana | Patrón detectado |
+| TC-P03 | 3 casos de la misma regla, todos fuera de la ventana (35-50 días) | Sin patrones |
+| TC-P04 | Regla `"informativo"` repetida 5 veces | Sin patrones (excluidas por diseño) |
+| TC-P05 | Múltiples patrones mixtos | Ordenamiento CRÍTICO > ALTO (mayor frecuencia) > ALTO (menor frecuencia) |
+| TC-P06 | Patrón estructural vs. patrón proceso | Textos e iconos diferentes |
+
+```bash
+# En Windows usar -X utf8 por el carácter → en los mensajes de test
+python -X utf8 tests/test_pattern_detector.py
 ```

@@ -20,11 +20,15 @@ SEHSA evalúa condiciones de higiene y seguridad alimentaria ingresadas por el u
 - Manejo de incertidumbre con principio de precaución (5 reglas específicas)
 - Detección de sospecha de ETA con derivación inmediata a autoridad sanitaria
 - Resolución de conflictos por prioridad numérica
-- Explicaciones adaptadas al perfil del usuario (operario, supervisor, profesional, gerente)
+- **Salida adaptada al perfil:** operario recibe lenguaje observable e imperativo en voseo; perfiles técnicos reciben terminología HACCP completa con normativa
+- **Preguntas observables para operarios:** el formulario traduce conceptos técnicos a hechos observables ("¿Usaste el mismo cuchillo sin lavar?" en lugar de "¿Hubo contaminación cruzada?")
+- **Detección de patrones recurrentes:** si una causa raíz se repite N veces (configurable) en una ventana de X días, el sistema sugiere una medida correctiva estructural
+- **Tarjetas visuales de selección** para inputs subjetivos (color y estado organoléptico), con swatch de color, descripción siempre visible y accesibilidad ARIA
 - Interfaz web SPA de 7 pantallas (sin frameworks externos)
+- Panel de alertas de patrones en el historial, con opción de marcar como atendida
 - Historial de casos persistente
 - Generación de reportes HTML imprimibles
-- Suite de pruebas con 6 casos de validación
+- Suite de pruebas con 12 casos de validación (6 de motor + 6 de detector de patrones)
 
 ---
 
@@ -69,6 +73,8 @@ SistemaExperto/
     ├── engine.py                   # Motor de inferencia (encadenamiento hacia adelante)
     ├── working_memory.py           # Memoria de trabajo OAV
     ├── explanation.py              # Sistema de explicación adaptativo por perfil
+    ├── pattern_detector.py         # Detección de patrones recurrentes en historial
+    ├── config.json                 # Parámetros configurables (umbral, ventana de días)
     ├── requirements.txt            # Dependencias Python
     ├── knowledge/
     │   ├── rules_incertidumbre.json
@@ -84,7 +90,8 @@ SistemaExperto/
     ├── data/
     │   └── historial_casos.json    # Historial (se crea automáticamente)
     └── tests/
-        ├── test_engine.py          # Pruebas unitarias
+        ├── test_engine.py          # Pruebas del motor de inferencia (TC-01 a TC-06)
+        ├── test_pattern_detector.py# Pruebas del detector de patrones (TC-P01 a TC-P06)
         └── casos_prueba.json       # Definiciones de casos de prueba
 ```
 
@@ -139,10 +146,18 @@ La variable de entorno `PORT` es leída automáticamente por la aplicación.
 
 ```bash
 cd sehsa/
+
+# Motor de inferencia (6 casos)
 python tests/test_engine.py
+
+# Detector de patrones (6 casos)
+# En Windows usar -X utf8 para evitar error de codificación en consola
+python -X utf8 tests/test_pattern_detector.py
 ```
 
-Los 6 casos de prueba validan: rotura de cadena de frío, violación de EPP con químicos, contaminación cruzada, detección de deterioro, indicios de plagas y sospecha de ETA con parada inmediata.
+**Motor de inferencia (TC-01 a TC-06):** rotura de cadena de frío, violación de EPP con químicos, contaminación cruzada, deterioro organoléptico, indicios de plagas y sospecha de ETA con parada inmediata.
+
+**Detector de patrones (TC-P01 a TC-P06):** historial vacío, patrón detectado en ventana, patrón fuera de ventana ignorado, regla informativa excluida, ordenamiento por riesgo y frecuencia, diferenciación de recomendación estructural vs. proceso.
 
 ---
 
@@ -152,9 +167,10 @@ Los 6 casos de prueba validan: rotura de cadena de frío, violación de EPP con 
 |--------|----------|-------------|
 | GET | `/` | Sirve la interfaz web |
 | POST | `/consulta` | Ejecuta la inferencia |
-| GET | `/modulos` | Lista módulos y preguntas |
+| GET | `/modulos?perfil=<perfil>` | Lista módulos y preguntas; adapta texto al perfil |
 | POST | `/guardar_caso` | Persiste un caso en historial |
 | GET | `/historial` | Obtiene todos los casos guardados |
+| GET | `/analisis_historial?n=<n>&dias=<dias>` | Detecta patrones recurrentes en el historial |
 | POST | `/reporte_html` | Genera reporte HTML imprimible |
 
 **Ejemplo de llamada a `/consulta`:**
